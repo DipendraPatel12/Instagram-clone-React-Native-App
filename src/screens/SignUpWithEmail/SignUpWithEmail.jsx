@@ -1,13 +1,24 @@
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 
 const SignUpWithEmail = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  console.warn('email', email);
+
+  const goTo = () => {
+    if (!email || email === '') {
+      Alert.alert('Email is required!');
+      return;
+    }
+    navigation.navigate('CreatePassword', { email: email.trim() });
+  };
   return (
     <View style={styles.container}>
       <View style={styles.innerConatiner}>
@@ -22,13 +33,17 @@ const SignUpWithEmail = ({ navigation }) => {
           placeholder="Email address"
           placeholderTextColor="grey"
           style={styles.textInputStyle}
+          value={email}
+          onChangeText={text => setEmail(text)}
         ></TextInput>
 
         <View style={{ gap: 20, marginTop: 15 }}>
           <TouchableOpacity
             style={styles.nextText}
             activeOpacity={0.7}
-            onPress={() => navigation.navigate('CreatePassword')}
+            onPress={() =>
+              navigation.navigate('CreatePassword', { email: email.trim() })
+            }
           >
             <Text style={styles.nextTextStyle}>Next</Text>
           </TouchableOpacity>
@@ -81,10 +96,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 20,
+    color: 'white',
   },
 
   nextText: {
-    backgroundColor: '#42A5F5',
+    backgroundColor: '#1565C0',
     padding: 15,
     borderRadius: 25,
   },

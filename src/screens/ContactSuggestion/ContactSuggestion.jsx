@@ -8,8 +8,7 @@ import {
 } from 'react-native';
 import React from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5/static';
-
-const Message = () => {
+const ContactSuggestion = () => {
   const messages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   return (
     <View style={{ flex: 1, backgroundColor: 'black', gap: 20 }}>
@@ -17,27 +16,27 @@ const Message = () => {
         style={{
           flexDirection: 'row',
           alignItems: 'center',
-          backgroundColor: '#263238',
           marginHorizontal: 20,
           paddingHorizontal: 20,
           borderRadius: 10,
-          gap: 10,
+          gap: 20,
           elevation: 5,
         }}
       >
-        <FontAwesome5
-          name="search"
-          color="white"
-          iconStyle="solid"
-        ></FontAwesome5>
+        <Text style={{ color: '#B0BEC5', fontWeight: '800', fontSize: 15 }}>
+          To :
+        </Text>
         <TextInput
           placeholder="Search"
+          placeholderTextColor={'#B0BEC5'}
           style={{ fontWeight: '800' }}
         ></TextInput>
       </View>
 
-      <View style={{ marginHorizontal: 20, gap: 20 }}>
-        <Text style={{ color: 'white', fontWeight: '800' }}>Messages</Text>
+      <View style={{ marginHorizontal: 20, gap: 30 }}>
+        <Text style={{ color: 'white', fontWeight: '800', fontSize: 18 }}>
+          Suggested
+        </Text>
 
         <FlatList
           data={messages}
@@ -72,8 +71,8 @@ const Message = () => {
                 <Text style={{ color: 'white', fontWeight: '500' }}>
                   dipendra
                 </Text>
-                <Text style={{ color: 'white', fontWeight: '500' }}>
-                  4+ new messages
+                <Text style={{ color: 'grey', fontWeight: '500' }}>
+                  dipendra_patel@102
                 </Text>
               </View>
             </View>
@@ -84,6 +83,6 @@ const Message = () => {
   );
 };
 
-export default Message;
+export default ContactSuggestion;
 
 const styles = StyleSheet.create({});

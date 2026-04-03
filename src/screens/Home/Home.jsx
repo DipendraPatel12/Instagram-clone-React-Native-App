@@ -1,50 +1,45 @@
 import {
   FlatList,
+  Image,
   StyleSheet,
   Text,
   TouchableOpacity,
   View,
+  RefreshControl,
 } from 'react-native';
-import React from 'react';
+import React, { useState } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
-
+import StoriesSlider from '../../components/StoriesSlider';
 const Home = () => {
-  const stories = [1, 2, 3, 4, 5, 6, 7, 8];
+  const [refreshing, setRefreshing] = useState(false);
+  const des = `@dipendra  Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet odit error saepe sequi tempore delenitis ed illo architecto natus perspiciatis! Officia ab adipisci quibusdam officiis beatae illum facere quaerat corporis `;
+  // const des = 'sdf sfdsf sfsfsdf ';
+  const [showMore, setShowMore] = useState(false);
+  const [selectedShowMoreIndex, setSelectedShowMoreIndex] = useState();
   const Post = [1, 2, 3, 4, 5, 6];
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    setTimeout(() => {
+      setRefreshing(false);
+    }, 5000);
+  };
   return (
     <View style={{ flex: 1, backgroundColor: 'black' }}>
-      <View style={{}}>
-        <FlatList
-          data={stories}
-          horizontal
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={{ paddingVertical: 10, marginHorizontal: 10 }}
-          renderItem={({ item }) => (
-            <View style={{ marginRight: 20 }}>
-              <TouchableOpacity
-                style={{
-                  height: 70,
-                  width: 70,
-                  borderWidth: 1,
-                  borderColor: '#FF80AB',
-                  borderRadius: 50,
-
-                  backgroundColor: '#263238',
-                }}
-              ></TouchableOpacity>
-              <Text style={{ color: 'white', textAlign: 'center' }}>
-                Dipendra
-              </Text>
-            </View>
-          )}
-        ></FlatList>
-      </View>
-
       <View>
         <FlatList
           data={Post}
-          renderItem={({ item }) => (
-            <View style={{ marginBottom: 10 }}>
+          refreshControl={
+            <RefreshControl
+              refreshing={refreshing}
+              onRefresh={onRefresh}
+              colors={['black']}
+              tintColor="black"
+              progressViewOffset={120}
+            />
+          }
+          renderItem={({ item, index }) => (
+            <View style={{ marginBottom: 10, gap: 10 }}>
               <View
                 style={{
                   flexDirection: 'row',
@@ -56,12 +51,28 @@ const Home = () => {
               >
                 <View
                   style={{
-                    height: 45,
-                    width: 45,
-                    backgroundColor: 'grey',
-                    borderRadius: 50,
+                    flexDirection: 'row',
+                    gap: 10,
+                    alignItems: 'center',
                   }}
-                ></View>
+                >
+                  <View
+                    style={{
+                      height: 45,
+                      width: 45,
+                      backgroundColor: 'grey',
+                      borderRadius: 50,
+                    }}
+                  >
+                    <Image
+                      source={require('../../assets/images/user1.jpg')}
+                      style={{ height: 45, width: 45, borderRadius: 50 }}
+                    ></Image>
+                  </View>
+                  <View>
+                    <Text style={{ color: 'white' }}>Dipendra</Text>
+                  </View>
+                </View>
 
                 <TouchableOpacity>
                   <FontAwesome5
@@ -74,7 +85,13 @@ const Home = () => {
               </View>
 
               {/* image */}
-              <View style={{ height: 400, backgroundColor: '#37474F' }}></View>
+              <View style={{ height: 400, backgroundColor: '#37474F' }}>
+                <Image
+                  source={require('../../assets/images/poster.jpg')}
+                  style={{ height: 400, width: 400 }}
+                  resizeMode="cover"
+                ></Image>
+              </View>
 
               <View
                 style={{
@@ -147,8 +164,37 @@ const Home = () => {
                   </TouchableOpacity>
                 </View>
               </View>
+
+              <View style={{ marginHorizontal: 20 }}>
+                <View>
+                  <Text style={{ color: 'white' }}>
+                    {showMore && selectedShowMoreIndex === index
+                      ? `${des} `
+                      : `${des.substring(0, 90)}`}
+                    {des.length > 90 && (
+                      <Text
+                        style={{
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          color: 'grey',
+                          fontWeight: '500',
+                        }}
+                        onPress={() => {
+                          setShowMore(!showMore);
+                          setSelectedShowMoreIndex(index);
+                        }}
+                      >
+                        {showMore && selectedShowMoreIndex === index
+                          ? ' show less'
+                          : ' show more'}
+                      </Text>
+                    )}
+                  </Text>
+                </View>
+              </View>
             </View>
           )}
+          ListHeaderComponent={<StoriesSlider></StoriesSlider>}
         ></FlatList>
       </View>
     </View>

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
@@ -75,12 +75,22 @@ const TabNavigation = () => {
         component={Profile}
         options={{
           tabBarIcon: ({ focused }) => (
-            <FontAwesome5
-              name="user"
-              size={20}
-              color="white"
-              iconStyle="solid"
-            />
+            // <FontAwesome5
+            //   name="user"
+            //   size={20}
+            //   color="white"
+            //   iconStyle="solid"
+            // />
+            <Image
+              source={require('../../src/assets/images/user1.jpg')}
+              style={{
+                height: 28,
+                width: 28,
+                borderRadius: 50,
+                borderWidth: 2,
+                borderColor: 'white',
+              }}
+            ></Image>
           ),
         }}
       ></Tab.Screen>

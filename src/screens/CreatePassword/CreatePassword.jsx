@@ -1,13 +1,52 @@
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, { use, useState } from 'react';
+import {
+  createUserWithEmailAndPassword,
+  getAuth,
+} from '@react-native-firebase/auth';
 
-const CreatePassword = ({ navigation }) => {
+const CreatePassword = ({ navigation, route }) => {
+  const email = route?.params?.email;
+  const [password, setPassword] = useState('');
+
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState('');
+  console.warn(`email --> ${email} , password --> ${password}`);
+
+  createUserWithEmailAndPassword;
+
+  const handleSignup = async () => {
+    if (!email || !password) {
+      Alert.alert('All field Required!');
+      return;
+    }
+    try {
+      const data = await createUserWithEmailAndPassword(
+        getAuth(),
+        email,
+        password,
+      );
+
+      await getAuth().currentUser.sendEmailVerification();
+      await getAuth().signOut();
+
+      Alert.alert('Please Chech Your Gmail For Verify Your Account.');
+
+      navigation.navigate('Login');
+
+      console.warn('data', data);
+    } catch (error) {
+      console.warn(error.message);
+    }
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.innerConatiner}>
@@ -22,6 +61,8 @@ const CreatePassword = ({ navigation }) => {
           placeholder="Password"
           placeholderTextColor="grey"
           style={styles.textInputStyle}
+          value={password}
+          onChangeText={text => setPassword(text)}
         ></TextInput>
 
         <View style={{ flexDirection: 'row' }}>
@@ -32,7 +73,11 @@ const CreatePassword = ({ navigation }) => {
         </View>
 
         <View style={{ gap: 20, marginTop: 15 }}>
-          <TouchableOpacity style={styles.nextText} activeOpacity={0.7}>
+          <TouchableOpacity
+            style={styles.nextText}
+            activeOpacity={0.7}
+            onPress={() => handleSignup()}
+          >
             <Text style={styles.nextTextStyle}>Next</Text>
           </TouchableOpacity>
         </View>
@@ -76,6 +121,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     padding: 20,
+    color: 'white',
   },
   notificationText: {
     color: 'white',
@@ -87,7 +133,7 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   nextText: {
-    backgroundColor: '#42A5F5',
+    backgroundColor: '#1565C0',
     padding: 15,
     borderRadius: 25,
   },

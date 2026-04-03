@@ -1,13 +1,62 @@
 import {
+  Alert,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+} from '@react-native-firebase/auth';
+import { StackActions } from '@react-navigation/native';
 
 const Login = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isError, setIsError] = useState(false);
+  const [error, setError] = useState([]);
+  const [loading, setLoading] = useState(false);
+  console.warn(`email ---> ${email} ,  password ----> ${password}`);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsError();
+      setError('');
+    }, 3000);
+  }, [isError]);
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('All field required!');
+      return;
+    }
+    setIsError(false);
+    setLoading(true);
+    try {
+      const user = await signInWithEmailAndPassword(getAuth(), email, password);
+      console.log(user.user);
+      setLoading(false);
+      if (user.user._user.emailVerified) {
+        // navigation.navigate('MainTabs');
+        navigation.dispatch(StackActions.replace('MainTabs'));
+      } else {
+        Alert.alert('Verify Email First!');
+      }
+      // console.warn('data', data);
+    } catch (error) {
+      console.warn(error);
+      setError('Invalid Credentials!');
+      setIsError(true);
+      setLoading(false);
+    }
+
+    setEmail('');
+    setPassword('');
+  };
+
   return (
     <View style={styles.container}>
       <View style={{ gap: 25 }}>
@@ -25,15 +74,19 @@ const Login = ({ navigation }) => {
         <View style={{ gap: 10 }}>
           <TextInput
             placeholderTextColor="grey"
-            placeholder="username"
+            placeholder="email"
             style={{
               backgroundColor: '#212121',
               borderWidth: 0.5,
               borderColor: 'grey',
               marginHorizontal: 20,
-              paddingHorizontal: 10,
-              borderRadius: 5,
+              color: 'white',
+              borderRadius: 10,
+              paddingVertical: 20,
+              paddingHorizontal: 20,
             }}
+            value={email}
+            onChangeText={text => setEmail(text)}
           ></TextInput>
 
           <TextInput
@@ -44,9 +97,13 @@ const Login = ({ navigation }) => {
               borderWidth: 0.5,
               borderColor: 'grey',
               marginHorizontal: 20,
-              paddingHorizontal: 10,
-              borderRadius: 5,
+              color: 'white',
+              borderRadius: 10,
+              paddingVertical: 20,
+              paddingHorizontal: 20,
             }}
+            value={password}
+            onChangeText={text => setPassword(text)}
           ></TextInput>
 
           <TouchableOpacity style={{ marginBottom: 20 }}>
@@ -68,18 +125,23 @@ const Login = ({ navigation }) => {
       <View style={{ gap: 35 }}>
         <TouchableOpacity
           style={{
-            backgroundColor: '#2196F3',
+            backgroundColor: '#1565C0',
             marginHorizontal: 20,
-            borderRadius: 5,
+            borderRadius: 20,
           }}
           activeOpacity={0.8}
-          onPress={() => navigation.navigate('MainTabs')}
+          onPress={() => handleLogin()}
         >
-          <Text style={{ textAlign: 'center', padding: 10, color: '#90A4AE' }}>
-            Log in
+          <Text style={{ textAlign: 'center', padding: 15, color: 'white' }}>
+            {loading ? `Logging...` : 'log in'}
           </Text>
         </TouchableOpacity>
 
+        {isError && (
+          <View>
+            <Text style={{ textAlign: 'center', color: 'red' }}>{error}</Text>
+          </View>
+        )}
         <View style={{ gap: 35 }}>
           <TouchableOpacity>
             <Text
@@ -127,7 +189,7 @@ const Login = ({ navigation }) => {
               Don't have an account?{' '}
             </Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('SignUpWithPhone')}
+              onPress={() => navigation.navigate('SignUpWithEmail')}
             >
               <Text
                 style={{

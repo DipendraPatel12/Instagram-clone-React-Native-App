@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   nextText: {
-    backgroundColor: '#42A5F5',
+    backgroundColor: '#1565C0',
     padding: 15,
     borderRadius: 25,
   },
