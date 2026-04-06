@@ -8,8 +8,11 @@ import {
 } from 'react-native';
 import React from 'react';
 
+import { useNavigation } from '@react-navigation/native';
+
 const StoriesSlider = () => {
   const stories = [1, 2, 3, 4, 5, 6, 7, 8];
+  const navigation = useNavigation();
   return (
     <>
       <FlatList
@@ -25,6 +28,11 @@ const StoriesSlider = () => {
                   ? { ...styles.storyStyle }
                   : { ...styles.storyStyle, ...styles.userStory }
               }
+              onPress={() => {
+                if (index == 0) {
+                  navigation.navigate('SetStory');
+                }
+              }}
             >
               <Image
                 source={require('../../src/assets/images/user1.jpg')}

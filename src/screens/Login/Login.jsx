@@ -14,8 +14,8 @@ import {
 import { StackActions } from '@react-navigation/native';
 
 const Login = ({ navigation }) => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState('dipendrapatel926@gmail.com');
+  const [password, setPassword] = useState('12345678');
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState([]);
   const [loading, setLoading] = useState(false);

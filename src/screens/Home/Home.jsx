@@ -10,13 +10,15 @@ import {
 import React, { useState } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import StoriesSlider from '../../components/StoriesSlider';
+import EmptyData from '../../components/EmptyData';
+
 const Home = () => {
   const [refreshing, setRefreshing] = useState(false);
   const des = `@dipendra  Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet odit error saepe sequi tempore delenitis ed illo architecto natus perspiciatis! Officia ab adipisci quibusdam officiis beatae illum facere quaerat corporis `;
   // const des = 'sdf sfdsf sfsfsdf ';
   const [showMore, setShowMore] = useState(false);
   const [selectedShowMoreIndex, setSelectedShowMoreIndex] = useState();
-  const Post = [1, 2, 3, 4, 5, 6];
+  const Post = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   const onRefresh = async () => {
     setRefreshing(true);
@@ -35,7 +37,7 @@ const Home = () => {
               onRefresh={onRefresh}
               colors={['black']}
               tintColor="black"
-              progressViewOffset={120}
+              progressViewOffset={80}
             />
           }
           renderItem={({ item, index }) => (
@@ -195,6 +197,12 @@ const Home = () => {
             </View>
           )}
           ListHeaderComponent={<StoriesSlider></StoriesSlider>}
+          ListEmptyComponent={<EmptyData title={'Post'}></EmptyData>}
+          contentContainerStyle={{
+            flexGrow: 1,
+            justifyContent: Post.length === 0 ? 'center' : 'flex-start',
+            alignItems: Post.length === 0 ? 'center' : 'stretch',
+          }}
         ></FlatList>
       </View>
     </View>

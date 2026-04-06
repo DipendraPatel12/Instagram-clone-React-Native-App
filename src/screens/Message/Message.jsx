@@ -4,12 +4,14 @@ import {
   StyleSheet,
   Text,
   TextInput,
+  TouchableHighlight,
   View,
+  KeyboardAvoidingView,
 } from 'react-native';
 import React from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5/static';
 
-const Message = () => {
+const Message = ({ navigation }) => {
   const messages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   return (
     <View style={{ flex: 1, backgroundColor: 'black', gap: 20 }}>
@@ -36,47 +38,60 @@ const Message = () => {
         ></TextInput>
       </View>
 
-      <View style={{ marginHorizontal: 20, gap: 20 }}>
-        <Text style={{ color: 'white', fontWeight: '800' }}>Messages</Text>
+      <View style={{ gap: 20 }}>
+        <Text
+          style={{ color: 'white', fontWeight: '800', marginHorizontal: 20 }}
+        >
+          Messages
+        </Text>
 
         <FlatList
           data={messages}
           showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
           renderItem={({ item }) => (
-            <View
+            <TouchableHighlight
               style={{
-                flexDirection: 'row',
                 marginBottom: 20,
-                gap: 20,
               }}
+              activeOpacity={0.6}
+              underlayColor="#263238"
+              // onPress={() => alert('Pressed!')}
+
+              onPress={() =>
+                navigation.navigate('Chat', { username: 'dipendra' })
+              }
             >
               {/* profile */}
-
               <View
-                style={{
-                  height: 60,
-                  width: 60,
-                  backgroundColor: '#263238',
-                  borderRadius: 50,
-                }}
+                style={{ flexDirection: 'row', gap: 20, marginHorizontal: 20 }}
               >
-                <Image
-                  source={require('../../assets/images/user1.jpg')}
-                  style={{ height: 60, width: 60, borderRadius: 50 }}
-                ></Image>
-              </View>
+                <View
+                  style={{
+                    height: 60,
+                    width: 60,
+                    backgroundColor: '#263238',
+                    borderRadius: 50,
+                  }}
+                >
+                  <Image
+                    source={require('../../assets/images/user1.jpg')}
+                    style={{ height: 60, width: 60, borderRadius: 50 }}
+                  ></Image>
+                </View>
 
-              {/* name and last message */}
+                {/* name and last message */}
 
-              <View style={{ justifyContent: 'center' }}>
-                <Text style={{ color: 'white', fontWeight: '500' }}>
-                  dipendra
-                </Text>
-                <Text style={{ color: 'white', fontWeight: '500' }}>
-                  4+ new messages
-                </Text>
+                <View style={{ justifyContent: 'center' }}>
+                  <Text style={{ color: 'white', fontWeight: '500' }}>
+                    dipendra
+                  </Text>
+                  <Text style={{ color: 'white', fontWeight: '500' }}>
+                    4+ new messages
+                  </Text>
+                </View>
               </View>
-            </View>
+            </TouchableHighlight>
           )}
         ></FlatList>
       </View>

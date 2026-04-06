@@ -8,6 +8,7 @@ import Message from '../screens/Message/Message';
 import Search from '../screens/Search/Search';
 import Profile from '../screens/Profile/Profile';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
+
 const TabNavigation = () => {
   return (
     <Tab.Navigator

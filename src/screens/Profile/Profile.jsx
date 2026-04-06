@@ -86,6 +86,12 @@ const Profile = ({ navigation }) => {
           gap: 20,
         }}
       >
+        <View>
+          <Image
+            source={require('../../assets/images/splash1.png')}
+            style={{ height: 250, width: 200 }}
+          ></Image>
+        </View>
         <View style={{ gap: 10 }}>
           <Text style={{ color: 'white', fontWeight: '800', fontSize: 25 }}>
             Create your first post
