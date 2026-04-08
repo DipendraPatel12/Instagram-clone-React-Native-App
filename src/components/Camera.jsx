@@ -6,11 +6,8 @@ const Camera = () => {
   const navigation = useNavigation();
   return (
     <>
-      <TouchableOpacity
-        onPress={() => navigation.navigate('CreatePost')}
-        style={{ marginLeft: 10 }}
-      >
-        <FontAwesome5 name="plus" size={25} color="white" iconStyle="solid" />
+      <TouchableOpacity onPress={() => navigation.navigate('CreatePost')}>
+        <FontAwesome5 name="camera" size={25} color="white" iconStyle="solid" />
       </TouchableOpacity>
     </>
   );

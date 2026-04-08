@@ -1,9 +1,18 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React from 'react';
+import {
+  Image,
+  Modal,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import React, { useState } from 'react';
 import { getAuth, signOut } from '@react-native-firebase/auth';
 import { StackActions } from '@react-navigation/native';
 
 const Profile = ({ navigation }) => {
+  const [isVisible, setVisible] = useState(false);
+
   const handleLogOut = async () => {
     try {
       await signOut(getAuth());
@@ -14,7 +23,7 @@ const Profile = ({ navigation }) => {
     }
   };
   return (
-    <View style={{ flex: 1, backgroundColor: 'black' }}>
+    <View style={{ flex: 1, backgroundColor: 'black' }}>an
       <View style={{ marginHorizontal: 20 }}>
         <View style={{ flexDirection: 'row', gap: 30 }}>
           <View
@@ -104,6 +113,7 @@ const Profile = ({ navigation }) => {
         </View>
 
         <TouchableOpacity
+          onPress={() => navigation.navigate('CreatePost')}
           style={{ backgroundColor: '#1976D2', borderRadius: 10 }}
         >
           <Text style={{ color: 'white', padding: 15, fontWeight: '500' }}>
@@ -124,6 +134,14 @@ const Profile = ({ navigation }) => {
           logout
         </Text>
       </TouchableOpacity>
+
+      <Modal
+        visible={isVisible}
+        animationType="slide"
+        onRequestClose={() => setVisible(false)}
+      >
+        <View style={{ flex: 1 / 2, backgroundColor: 'green' }}></View>
+      </Modal>
     </View>
   );
 };

@@ -18,3 +18,17 @@ const App = () => {
 export default App
 
 const styles = StyleSheet.create({})
+
+
+
+// import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+
+// function App() {
+//   return (
+//     <SafeAreaProvider>
+//       <SafeAreaView style={{ flex: 1 }}>
+//         {/* Your content will now avoid the notch and home indicator */}
+//       </SafeAreaView>
+//     </SafeAreaProvider>
+//   );
+// }

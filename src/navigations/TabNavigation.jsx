@@ -2,12 +2,14 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 
-const Tab = createMaterialTopTabNavigator();
+// const Tab = createMaterialTopTabNavigator();
+const Tab = createBottomTabNavigator();
 import Home from '../screens/Home/Home';
 import Message from '../screens/Message/Message';
 import Search from '../screens/Search/Search';
 import Profile from '../screens/Profile/Profile';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 const TabNavigation = () => {
   return (

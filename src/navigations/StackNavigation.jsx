@@ -1,4 +1,4 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
 import React from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from '../screens/Login/Login';
@@ -10,16 +10,21 @@ import CreatePost from '../screens/CreatePost/CreatePost';
 import SetStory from '../screens/SetStory/SetStory';
 import Chat from '../screens/Chat/Chat';
 import Splash from '../screens/Splash/Splash';
-import Camera from '../components/Camera';
+import CreatePostBtn from '../components/CreatePostBtn';
 import Notification from '../components/Notification';
 import TabNavigation from './TabNavigation';
 import CloseBtn from '../components/CloseBtn';
-
+import ProfileHeader from '../components/ProfileHeader';
+import SetUsername from '../screens/SetUsername/SetUsername';
+import SearchedProfile from '../screens/SearchedProfile/SearchedProfile';
+import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
-
+import DrawerNavigation from './DrawerNavigation';
+import MessageContacts from '../components/MessageContacts';
+import MainTabs from '../navigations/MainTabs';
 const Stack = createNativeStackNavigator();
 
-const StackNavigation = ({ route }) => {
+const StackNavigation = () => {
   return (
     <>
       <Stack.Navigator>
@@ -32,10 +37,10 @@ const StackNavigation = ({ route }) => {
         {/* maintabs */}
         <Stack.Screen
           name="MainTabs"
-          component={TabNavigation}
+          component={MainTabs}
           options={{
-            headerBackVisible: false,
-            headerLeft: () => <Camera></Camera>,
+            headerShown: false,
+            headerLeft: () => <CreatePostBtn></CreatePostBtn>,
             headerRight: () => <Notification></Notification>,
             headerTitleAlign: 'center',
             headerTitle: '𝑰𝒏𝒔𝒕𝒂𝒈𝒓𝒂𝒎',
@@ -44,6 +49,48 @@ const StackNavigation = ({ route }) => {
             headerStyle: { backgroundColor: 'black' },
           }}
         ></Stack.Screen>
+
+        {/* <Stack.Screen
+          name="MainTabs"
+          component={TabNavigation}
+          options={({ route }) => {
+            const focusedTab = getFocusedRouteName(route);
+
+            // Choose icons based on active tab
+            let leftIcon = null;
+            let rightIcon = null;
+
+            switch (focusedTab) {
+              case 'Home':
+                leftIcon = <CreatePostBtn />;
+                rightIcon = <Notification />;
+                break;
+              case 'Search':
+                leftIcon = <CreatePostBtn />;
+                rightIcon = <Notification />;
+                break;
+              case 'Message':
+                rightIcon = <MessageContacts />;
+                break;
+              case 'Profile':
+                leftIcon = <CreatePostBtn />;
+                rightIcon = <Notification />;
+                break;
+              default:
+                leftIcon = null;
+                rightIcon = null;
+            }
+
+            return {
+              headerTitle: getHeaderTitle(route),
+              headerLeft: () => leftIcon,
+              headerRight: () => rightIcon,
+              headerStyle: { backgroundColor: 'black' },
+              headerTintColor: 'white',
+              headerTitleAlign: 'center',
+            };
+          }}
+        /> */}
         {/* login */}
         <Stack.Screen
           name="Login"
@@ -51,6 +98,16 @@ const StackNavigation = ({ route }) => {
           options={{ headerShown: false }}
         ></Stack.Screen>
 
+        <Stack.Screen
+          name="SetUsername"
+          component={SetUsername}
+          options={{
+            headerTintColor: 'white',
+            headerTitle: '',
+            headerStyle: { backgroundColor: '#212121' },
+            headerShadowVisible: false,
+          }}
+        ></Stack.Screen>
         {/* signup with phone */}
         <Stack.Screen
           name="SignUpWithPhone"
@@ -108,41 +165,12 @@ const StackNavigation = ({ route }) => {
             headerStyle: { backgroundColor: 'black' },
             headerTintColor: 'white',
             headerTitle: () => (
-              <View
-                style={{
-                  alignItems: 'center',
-                  flexDirection: 'row',
-                  gap: 10,
-                }}
-              >
-                <View
-                  style={{
-                    height: 40,
-                    width: 40,
-                    backgroundColor: 'grey',
-                    borderRadius: 50,
-                  }}
-                >
-                  <Image
-                    source={require('../assets/images/user1.jpg')}
-                    style={{ height: 40, width: 40, borderRadius: 50 }}
-                    resizeMode="contain"
-                  ></Image>
-                </View>
-
-                <View>
-                  <Text style={{ color: 'white', fontWeight: '500' }}>
-                    {route.params.username}
-                  </Text>
-                  <Text style={{ color: 'grey', fontWeight: '500' }}>
-                    dipendra@123
-                  </Text>
-                </View>
-              </View>
+              <ProfileHeader username={route?.params?.username}></ProfileHeader>
             ),
           })}
         ></Stack.Screen>
 
+        {/* /set Story */}
         <Stack.Screen
           name="SetStory"
           component={SetStory}
@@ -155,6 +183,7 @@ const StackNavigation = ({ route }) => {
           }}
         ></Stack.Screen>
 
+        {/* /Create Post */}
         <Stack.Screen
           name="CreatePost"
           component={CreatePost}
@@ -168,6 +197,27 @@ const StackNavigation = ({ route }) => {
               <Text style={{ color: '#42A5F5', fontSize: 20 }}>Post</Text>
             ),
           }}
+        ></Stack.Screen>
+
+        <Stack.Screen
+          name="SearchedProfile"
+          component={SearchedProfile}
+          options={({ route }) => ({
+            headerTintColor: 'white',
+            headerStyle: { backgroundColor: 'black' },
+            headerTitle: route?.params?.username,
+
+            headerRight: () => (
+              <TouchableOpacity>
+                <FontAwesome5
+                  name="ellipsis-v"
+                  size={15}
+                  color="white"
+                  iconStyle="solid"
+                />
+              </TouchableOpacity>
+            ),
+          })}
         ></Stack.Screen>
       </Stack.Navigator>
     </>

@@ -9,6 +9,7 @@ const CreatePost = () => {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [endCursor, setEndCursor] = useState();
   const [previewImage, setPreviewImage] = useState();
+  
   useEffect(() => {
     const getPhotos = async () => {
       const response = await CameraRoll.getPhotos({

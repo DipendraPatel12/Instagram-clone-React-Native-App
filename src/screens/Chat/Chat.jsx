@@ -107,7 +107,7 @@ const Chat = () => {
           >
             <Camera></Camera>
           </View>
-          <View style={{ width: '75%' }}>
+          <View style={{ width: '70%' }}>
             <TextInput
               placeholder="Message..."
               placeholderTextColor="grey"

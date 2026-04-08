@@ -189,7 +189,7 @@ const Login = ({ navigation }) => {
               Don't have an account?{' '}
             </Text>
             <TouchableOpacity
-              onPress={() => navigation.navigate('SignUpWithEmail')}
+              onPress={() => navigation.navigate('SetUsername')}
             >
               <Text
                 style={{

@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import React, { use, useState } from 'react';
+import firestore from '@react-native-firebase/firestore';
 import {
   createUserWithEmailAndPassword,
   getAuth,
@@ -14,13 +15,14 @@ import {
 
 const CreatePassword = ({ navigation, route }) => {
   const email = route?.params?.email;
+  const username = route?.params?.username;
   const [password, setPassword] = useState('');
 
   const [isError, setIsError] = useState(false);
   const [error, setError] = useState('');
-  console.warn(`email --> ${email} , password --> ${password}`);
-
-  createUserWithEmailAndPassword;
+  console.warn(
+    `email --> ${email} , username --> ${username} password --> ${password}`,
+  );
 
   const handleSignup = async () => {
     if (!email || !password) {
@@ -28,11 +30,19 @@ const CreatePassword = ({ navigation, route }) => {
       return;
     }
     try {
-      const data = await createUserWithEmailAndPassword(
+      const res = await createUserWithEmailAndPassword(
         getAuth(),
         email,
         password,
       );
+
+      const userData = {
+        id: res.user.uid,
+        email,
+        username,
+      };
+
+      await firestore().collection('users').doc(res.user.uid).set(userData);
 
       await getAuth().currentUser.sendEmailVerification();
       await getAuth().signOut();
@@ -41,7 +51,7 @@ const CreatePassword = ({ navigation, route }) => {
 
       navigation.navigate('Login');
 
-      console.warn('data', data);
+      console.warn('data', res);
     } catch (error) {
       console.warn(error.message);
     }
