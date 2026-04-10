@@ -3,7 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { FlashList } from '@shopify/flash-list';
 import EmptyData from '../../components/EmptyData';
-const SetStory = () => {
+import { rh, rw } from '../../helper/responsive';
+const SetStory = ({ navigation }) => {
   const [data, setData] = useState([]);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [endCursor, setEndCursor] = useState();
@@ -13,7 +14,6 @@ const SetStory = () => {
         first: 25,
         assetType: 'All',
       });
-
       console.log('Photos', response);
       setHasNextPage(response?.page_info?.has_next_page);
       setEndCursor(response?.page_info?.end_cursor);
@@ -85,10 +85,18 @@ const SetStory = () => {
         data={data}
         numColumns={3}
         renderItem={({ item }) => (
-          <TouchableOpacity style={{ position: 'relative' }}>
+          <TouchableOpacity
+            style={{ position: 'relative' }}
+            onPress={() =>
+              navigation.navigate('Step2', {
+                img: item?.node?.image?.uri,
+                type: item?.node?.type,
+              })
+            }
+          >
             <Image
               source={{ uri: item?.node?.image?.uri }}
-              style={{ width: 131, height: 130 }}
+              style={{ width: rw(33.33), height: rh(20) }}
               resizeMode="cover"
             ></Image>
             {item?.node?.type === 'video/mp4' && (

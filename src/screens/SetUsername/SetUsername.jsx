@@ -7,6 +7,7 @@ import {
   View,
 } from 'react-native';
 import React, { useState } from 'react';
+import { rf, rh, rw } from '../../helper/responsive';
 
 const SetUsername = ({ navigation }) => {
   const [username, setUsername] = useState('');
@@ -61,19 +62,19 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   innerConatiner: {
-    marginHorizontal: 25,
+    marginHorizontal: rw(5),
     gap: 10,
   },
   heading: {
     color: 'white',
     fontWeight: '800',
-    fontSize: 24,
+    fontSize: rf(3.5),
   },
   secondHeading: {
     color: 'white',
-    fontSize: 15,
+    fontSize: rf(1.8),
     fontWeight: '500',
-    marginBottom: 15,
+    marginBottom: rh(1.5),
   },
   textInputStyle: {
     borderColor: 'grey',
@@ -81,6 +82,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     padding: 20,
     color: 'white',
+    fontSize: rf(1.8),
   },
 
   nextText: {
@@ -92,7 +94,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'white',
     fontWeight: '500',
-    fontSize: 15,
+    fontSize: rf(2),
   },
   signupBtn: {
     backgroundColor: '#37474F',
@@ -102,6 +104,6 @@ const styles = StyleSheet.create({
   alreadyAccountText: {
     color: '#42A5F5',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: rh(4),
   },
 });

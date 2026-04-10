@@ -7,30 +7,48 @@ import {
   View,
   RefreshControl,
 } from 'react-native';
-import React, { useState } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import StoriesSlider from '../../components/StoriesSlider';
 import EmptyData from '../../components/EmptyData';
-
-const Home = () => {
+import firestore from '@react-native-firebase/firestore';
+import { rf, rh, rw } from '../../helper/responsive';
+import { useDispatch } from 'react-redux';
+import { getUserProfile } from '../../redux/slices/authSlice';
+import { getAuth } from '@react-native-firebase/auth';
+const Home = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
   const des = `@dipendra  Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet odit error saepe sequi tempore delenitis ed illo architecto natus perspiciatis! Officia ab adipisci quibusdam officiis beatae illum facere quaerat corporis `;
   // const des = 'sdf sfdsf sfsfsdf ';
   const [showMore, setShowMore] = useState(false);
   const [selectedShowMoreIndex, setSelectedShowMoreIndex] = useState();
+  const [allPost, setAllPost] = useState([]);
+  const user = getAuth().currentUser._user;
+  console.log('user in home ', user);
   const Post = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-
+  console.log(allPost);
+  useEffect(() => {
+    getPosts();
+    dispatch(getUserProfile(user.uid));
+  }, []);
+  const getPosts = async () => {
+    const posts = await firestore().collection('posts').get();
+    console.log('data from posts collection', posts._docs);
+    setAllPost(posts._docs);
+  };
   const onRefresh = async () => {
     setRefreshing(true);
     setTimeout(() => {
+      getPosts();
       setRefreshing(false);
-    }, 5000);
+    }, 2000);
   };
   return (
     <View style={{ flex: 1, backgroundColor: 'black' }}>
       <View>
         <FlatList
-          data={Post}
+          data={allPost}
           refreshControl={
             <RefreshControl
               refreshing={refreshing}
@@ -41,40 +59,47 @@ const Home = () => {
             />
           }
           renderItem={({ item, index }) => (
-            <View style={{ marginBottom: 10, gap: 10 }}>
+            <View style={{ marginBottom: rh(3), gap: rh(2) }}>
               <View
                 style={{
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                  paddingVertical: 5,
-                  marginHorizontal: 20,
+                  marginHorizontal: rw(4),
                   alignItems: 'center',
                 }}
               >
-                <View
+                <TouchableOpacity
                   style={{
                     flexDirection: 'row',
                     gap: 10,
                     alignItems: 'center',
                   }}
+                  activeOpacity={0.8}
+                  onPress={() =>
+                    navigation.navigate('SearchedProfile', {
+                      id: item?._data?.uid,
+                    })
+                  }
                 >
                   <View
                     style={{
-                      height: 45,
-                      width: 45,
+                      height: rh(6),
+                      width: rh(6),
                       backgroundColor: 'grey',
                       borderRadius: 50,
                     }}
                   >
                     <Image
-                      source={require('../../assets/images/user1.jpg')}
-                      style={{ height: 45, width: 45, borderRadius: 50 }}
+                      source={{ uri: item?._data?.post_media_url }}
+                      style={{ height: rh(6), width: rh(6), borderRadius: 50 }}
                     ></Image>
                   </View>
                   <View>
-                    <Text style={{ color: 'white' }}>Dipendra</Text>
+                    <Text style={{ color: 'white' }}>
+                      {item?._data?.username || 'Unknown'}
+                    </Text>
                   </View>
-                </View>
+                </TouchableOpacity>
 
                 <TouchableOpacity>
                   <FontAwesome5
@@ -87,20 +112,20 @@ const Home = () => {
               </View>
 
               {/* image */}
-              <View style={{ height: 400, backgroundColor: '#37474F' }}>
+              <View style={{ height: rh(50), backgroundColor: '#37474F' }}>
                 <Image
-                  source={require('../../assets/images/poster.jpg')}
-                  style={{ height: 400, width: 400 }}
+                  source={{ uri: item?._data?.post_media_url }}
+                  style={{ height: rh(50), width: rw(100) }}
                   resizeMode="cover"
                 ></Image>
               </View>
 
               <View
                 style={{
-                  marginHorizontal: 20,
+                  marginHorizontal: rw(4),
                   flexDirection: 'row',
                   justifyContent: 'space-between',
-                  paddingVertical: 10,
+                  paddingVertical: rh(1),
                 }}
               >
                 <View style={{ flexDirection: 'row', gap: 10 }}>
@@ -113,7 +138,13 @@ const Home = () => {
                     }}
                   >
                     <FontAwesome5 name="heart" size={25} color="white" />
-                    <Text style={{ color: 'white', fontWeight: '500' }}>
+                    <Text
+                      style={{
+                        color: 'white',
+                        fontWeight: '500',
+                        fontSize: rf(2),
+                      }}
+                    >
                       {25}
                     </Text>
                   </TouchableOpacity>
@@ -127,7 +158,13 @@ const Home = () => {
                     }}
                   >
                     <FontAwesome5 name="comment" size={25} color="white" />
-                    <Text style={{ color: 'white', fontWeight: '500' }}>
+                    <Text
+                      style={{
+                        color: 'white',
+                        fontWeight: '500',
+                        fontSize: rf(2),
+                      }}
+                    >
                       {25}
                     </Text>
                   </TouchableOpacity>
@@ -141,7 +178,13 @@ const Home = () => {
                     }}
                   >
                     <FontAwesome5 name="heart" size={25} color="white" />
-                    <Text style={{ color: 'white', fontWeight: '500' }}>
+                    <Text
+                      style={{
+                        color: 'white',
+                        fontWeight: '500',
+                        fontSize: rf(2),
+                      }}
+                    >
                       {25}
                     </Text>
                   </TouchableOpacity>
@@ -154,7 +197,13 @@ const Home = () => {
                     }}
                   >
                     <FontAwesome5 name="heart" size={25} color="white" />
-                    <Text style={{ color: 'white', fontWeight: '500' }}>
+                    <Text
+                      style={{
+                        color: 'white',
+                        fontWeight: '500',
+                        fontSize: rf(2),
+                      }}
+                    >
                       {25}
                     </Text>
                   </TouchableOpacity>
@@ -169,11 +218,11 @@ const Home = () => {
 
               <View style={{ marginHorizontal: 20 }}>
                 <View>
-                  <Text style={{ color: 'white' }}>
+                  <Text style={{ color: 'white', fontSize: rf(1.8) }}>
                     {showMore && selectedShowMoreIndex === index
-                      ? `${des} `
-                      : `${des.substring(0, 90)}`}
-                    {des.length > 90 && (
+                      ? `${item?._data?.content} `
+                      : `${item?._data?.content.substring(0, 90)}`}
+                    {item?._data?.content.length > 90 && (
                       <Text
                         style={{
                           justifyContent: 'center',

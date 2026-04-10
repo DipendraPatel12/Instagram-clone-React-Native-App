@@ -8,9 +8,9 @@ const CloseBtn = () => {
   return (
     <TouchableOpacity
       onPress={() => navigation.goBack()}
-      style={{ marginLeft: 10 }}
+      style={{ marginHorizontal: 15 }}
     >
-      <FontAwesome5 name="times" size={30} color="white" iconStyle="solid" />
+      <FontAwesome5 name="times" size={25} color="white" iconStyle="solid" />
     </TouchableOpacity>
   );
 };

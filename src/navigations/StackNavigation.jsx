@@ -6,28 +6,30 @@ import SignUpWithPhone from '../screens/SignUpWithPhone/SignUpWithPhone';
 import SignUpWithEmail from '../screens/SignUpWithEmail/SignUpWithEmail';
 import CreatePassword from '../screens/CreatePassword/CreatePassword';
 import ContactSuggestion from '../screens/ContactSuggestion/ContactSuggestion';
-import CreatePost from '../screens/CreatePost/CreatePost';
+import CreatePostStep1 from '../screens/CreatePost/CreatePostStep1/CreatePostStep1';
+import CreatePostStep2 from '../screens/CreatePost/CreatePostStep2/CreatePostStep2';
 import SetStory from '../screens/SetStory/SetStory';
 import Chat from '../screens/Chat/Chat';
 import Splash from '../screens/Splash/Splash';
 import CreatePostBtn from '../components/CreatePostBtn';
 import Notification from '../components/Notification';
-import TabNavigation from './TabNavigation';
 import CloseBtn from '../components/CloseBtn';
 import ProfileHeader from '../components/ProfileHeader';
 import SetUsername from '../screens/SetUsername/SetUsername';
 import SearchedProfile from '../screens/SearchedProfile/SearchedProfile';
-import { getFocusedRouteNameFromRoute } from '@react-navigation/native';
+
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
-import DrawerNavigation from './DrawerNavigation';
-import MessageContacts from '../components/MessageContacts';
+
 import MainTabs from '../navigations/MainTabs';
+import EditProfile from '../screens/Profile/EditProfile/EditProfile';
+import Step2 from '../screens/SetStory/Step2/Step2';
 const Stack = createNativeStackNavigator();
 
-const StackNavigation = () => {
+const StackNavigation = ({ navigation }) => {
   return (
     <>
       <Stack.Navigator>
+        {/* ṣplash screen */}
         <Stack.Screen
           name="Splash"
           component={Splash}
@@ -50,47 +52,6 @@ const StackNavigation = () => {
           }}
         ></Stack.Screen>
 
-        {/* <Stack.Screen
-          name="MainTabs"
-          component={TabNavigation}
-          options={({ route }) => {
-            const focusedTab = getFocusedRouteName(route);
-
-            // Choose icons based on active tab
-            let leftIcon = null;
-            let rightIcon = null;
-
-            switch (focusedTab) {
-              case 'Home':
-                leftIcon = <CreatePostBtn />;
-                rightIcon = <Notification />;
-                break;
-              case 'Search':
-                leftIcon = <CreatePostBtn />;
-                rightIcon = <Notification />;
-                break;
-              case 'Message':
-                rightIcon = <MessageContacts />;
-                break;
-              case 'Profile':
-                leftIcon = <CreatePostBtn />;
-                rightIcon = <Notification />;
-                break;
-              default:
-                leftIcon = null;
-                rightIcon = null;
-            }
-
-            return {
-              headerTitle: getHeaderTitle(route),
-              headerLeft: () => leftIcon,
-              headerRight: () => rightIcon,
-              headerStyle: { backgroundColor: 'black' },
-              headerTintColor: 'white',
-              headerTitleAlign: 'center',
-            };
-          }}
-        /> */}
         {/* login */}
         <Stack.Screen
           name="Login"
@@ -98,6 +59,7 @@ const StackNavigation = () => {
           options={{ headerShown: false }}
         ></Stack.Screen>
 
+        {/* setUser name */}
         <Stack.Screen
           name="SetUsername"
           component={SetUsername}
@@ -108,6 +70,7 @@ const StackNavigation = () => {
             headerShadowVisible: false,
           }}
         ></Stack.Screen>
+
         {/* signup with phone */}
         <Stack.Screen
           name="SignUpWithPhone"
@@ -183,19 +146,45 @@ const StackNavigation = () => {
           }}
         ></Stack.Screen>
 
+        {/* set story step2 */}
+
+        <Stack.Screen
+          name="Step2"
+          component={Step2}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+
         {/* /Create Post */}
         <Stack.Screen
-          name="CreatePost"
-          component={CreatePost}
+          name="CreatePostStep1"
+          component={CreatePostStep1}
+          options={({ navigation }) => ({
+            headerStyle: { backgroundColor: 'black' },
+            headerTintColor: 'white',
+            headerTitle: 'New post',
+            headerBackVisible: false,
+
+            headerLeft: () => <CloseBtn></CloseBtn>,
+            headerRight: () => (
+              <TouchableOpacity
+                onPress={() => {
+                  navigation.navigate('CreatePostStep2');
+                }}
+              >
+                <Text style={{ color: '#42A5F5', fontSize: 20 }}>Next</Text>
+              </TouchableOpacity>
+            ),
+          })}
+        ></Stack.Screen>
+
+        {/* /Create Post step2  */}
+        <Stack.Screen
+          name="CreatePostStep2"
+          component={CreatePostStep2}
           options={{
             headerStyle: { backgroundColor: 'black' },
             headerTintColor: 'white',
             headerTitle: '',
-            headerBackVisible: false,
-            headerLeft: () => <CloseBtn></CloseBtn>,
-            headerRight: () => (
-              <Text style={{ color: '#42A5F5', fontSize: 20 }}>Post</Text>
-            ),
           }}
         ></Stack.Screen>
 
@@ -218,6 +207,17 @@ const StackNavigation = () => {
               </TouchableOpacity>
             ),
           })}
+        ></Stack.Screen>
+
+        {/* editProfile */}
+        <Stack.Screen
+          name="EditProfile"
+          component={EditProfile}
+          options={{
+            headerTitle: 'Edit profile',
+            headerStyle: { backgroundColor: 'black' },
+            headerTintColor: 'white',
+          }}
         ></Stack.Screen>
       </Stack.Navigator>
     </>

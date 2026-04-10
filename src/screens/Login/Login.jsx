@@ -12,8 +12,11 @@ import {
   signInWithEmailAndPassword,
 } from '@react-native-firebase/auth';
 import { StackActions } from '@react-navigation/native';
-
+import { rf, rh, rw } from '../../helper/responsive';
+import { useDispatch } from 'react-redux';
+import { getUserProfile } from '../../redux/slices/authSlice';
 const Login = ({ navigation }) => {
+  const dipatch = useDispatch();
   const [email, setEmail] = useState('dipendrapatel926@gmail.com');
   const [password, setPassword] = useState('12345678');
   const [isError, setIsError] = useState(false);
@@ -41,6 +44,7 @@ const Login = ({ navigation }) => {
       setLoading(false);
       if (user.user._user.emailVerified) {
         // navigation.navigate('MainTabs');
+        dipatch(getUserProfile(user.user._user.uid));
         navigation.dispatch(StackActions.replace('MainTabs'));
       } else {
         Alert.alert('Verify Email First!');
@@ -65,7 +69,7 @@ const Login = ({ navigation }) => {
             color: 'white',
             textAlign: 'center',
             fontWeight: '400',
-            fontSize: 35,
+            fontSize: rf(5),
           }}
         >
           Instagram
@@ -77,13 +81,15 @@ const Login = ({ navigation }) => {
             placeholder="email"
             style={{
               backgroundColor: '#212121',
-              borderWidth: 0.5,
+              borderWidth: 0.4,
               borderColor: 'grey',
-              marginHorizontal: 20,
+              marginHorizontal: rw(5),
               color: 'white',
               borderRadius: 10,
-              paddingVertical: 20,
-              paddingHorizontal: 20,
+              paddingVertical: rh(2.5),
+              paddingHorizontal: rw(5),
+              elevation: 2,
+              fontSize: rf(1.8),
             }}
             value={email}
             onChangeText={text => setEmail(text)}
@@ -94,26 +100,28 @@ const Login = ({ navigation }) => {
             placeholder="password"
             style={{
               backgroundColor: '#212121',
-              borderWidth: 0.5,
+              borderWidth: 0.4,
               borderColor: 'grey',
-              marginHorizontal: 20,
+              marginHorizontal: rw(5),
               color: 'white',
               borderRadius: 10,
-              paddingVertical: 20,
-              paddingHorizontal: 20,
+              paddingVertical: rh(2.5),
+              paddingHorizontal: rw(5),
+              fontSize: rf(1.8),
+              elevation: 10,
             }}
             value={password}
             onChangeText={text => setPassword(text)}
           ></TextInput>
 
-          <TouchableOpacity style={{ marginBottom: 20 }}>
+          <TouchableOpacity style={{ marginBottom: rh(4) }}>
             <Text
               style={{
                 color: '#90CAF9',
                 textAlign: 'right',
-                marginHorizontal: 20,
+                marginHorizontal: rw(5),
                 fontWeight: '500',
-                fontSize: 13,
+                fontSize: rf(1.8),
               }}
             >
               Forgot Password ?
@@ -126,20 +134,31 @@ const Login = ({ navigation }) => {
         <TouchableOpacity
           style={{
             backgroundColor: '#1565C0',
-            marginHorizontal: 20,
+            marginHorizontal: rw(5),
             borderRadius: 20,
           }}
           activeOpacity={0.8}
           onPress={() => handleLogin()}
         >
-          <Text style={{ textAlign: 'center', padding: 15, color: 'white' }}>
+          <Text
+            style={{
+              textAlign: 'center',
+              padding: 15,
+              color: 'white',
+              fontSize: rf(1.8),
+            }}
+          >
             {loading ? `Logging...` : 'log in'}
           </Text>
         </TouchableOpacity>
 
         {isError && (
           <View>
-            <Text style={{ textAlign: 'center', color: 'red' }}>{error}</Text>
+            <Text
+              style={{ textAlign: 'center', color: 'red', fontSize: rf(1.5) }}
+            >
+              {error}
+            </Text>
           </View>
         )}
         <View style={{ gap: 35 }}>
@@ -148,9 +167,9 @@ const Login = ({ navigation }) => {
               style={{
                 color: '#90CAF9',
                 textAlign: 'center',
-                marginHorizontal: 20,
+                marginHorizontal: rw(5),
                 fontWeight: '500',
-                fontSize: 13,
+                fontSize: rf(1.8),
               }}
             >
               Log in with Facebook
@@ -168,25 +187,32 @@ const Login = ({ navigation }) => {
               style={{
                 borderBottomWidth: 0.5,
                 borderColor: 'white',
-                width: '35%',
-                marginHorizontal: 25,
+                width: rw(35),
+                marginHorizontal: rw(5),
               }}
             ></View>
-            <Text style={{ color: '#90A4AE', textAlign: 'center' }}>OR</Text>
+            <Text
+              style={{
+                color: '#90A4AE',
+                textAlign: 'center',
+                fontSize: rf(1.9),
+              }}
+            >
+              OR
+            </Text>
             <View
               style={{
                 borderBottomWidth: 0.5,
                 borderColor: 'white',
-                width: '35%',
-                marginHorizontal: 25,
+                width: rw(35),
+                marginHorizontal: rw(5),
               }}
             ></View>
           </View>
 
           <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <Text style={{ color: '#90A4AE', fontSize: 13 }}>
-              {' '}
-              Don't have an account?{' '}
+            <Text style={{ color: '#90A4AE', fontSize: rf(1.8) }}>
+              Don't have an account? {''}
             </Text>
             <TouchableOpacity
               onPress={() => navigation.navigate('SetUsername')}
@@ -196,7 +222,7 @@ const Login = ({ navigation }) => {
                   color: '#90CAF9',
                   textAlign: 'center',
                   fontWeight: '500',
-                  fontSize: 13,
+                  fontSize: rf(1.8),
                 }}
               >
                 Sign up.

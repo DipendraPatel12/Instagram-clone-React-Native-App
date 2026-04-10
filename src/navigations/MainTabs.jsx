@@ -10,9 +10,12 @@ import CreatePostBtn from '../components/CreatePostBtn';
 import Notification from '../components/Notification';
 import MessageContacts from '../components/MessageContacts';
 import SearchProfile from '../components/SearchProfile';
+import { useSelector } from 'react-redux';
+import { rh, rw } from '../helper/responsive';
 
 const Tab = createBottomTabNavigator();
 const MainTabs = () => {
+  const { user } = useSelector(state => state.auth);
   return (
     <Tab.Navigator
       screenOptions={{
@@ -41,15 +44,13 @@ const MainTabs = () => {
           headerTitleStyle: { fontSize: 25 },
           headerLeft: () => <CreatePostBtn></CreatePostBtn>,
           headerRight: () => <Notification></Notification>,
-          tabBarIcon: () => (
-            <TouchableOpacity>
-              <FontAwesome5
-                name="home"
-                size={20}
-                color="white"
-                iconStyle="solid"
-              />
-            </TouchableOpacity>
+          tabBarIcon: ({ focused }) => (
+            <FontAwesome5
+              name="home"
+              size={20}
+              color="white"
+              iconStyle="solid"
+            />
           ),
         }}
       />
@@ -58,18 +59,16 @@ const MainTabs = () => {
         component={Message}
         options={{
           headerTitleAlign: 'center',
-          headerTitle: 'dipendra_patel926',
+          headerTitle: user?.username || 'Unknown',
           headerTitleStyle: { fontSize: 20 },
           headerRight: () => <MessageContacts></MessageContacts>,
           tabBarIcon: () => (
-            <TouchableOpacity>
-              <FontAwesome5
-                name="share"
-                size={20}
-                color="white"
-                iconStyle="solid"
-              />
-            </TouchableOpacity>
+            <FontAwesome5
+              name="share"
+              size={20}
+              color="white"
+              iconStyle="solid"
+            />
           ),
         }}
       />
@@ -80,14 +79,12 @@ const MainTabs = () => {
           //   headerLeft: () => <SearchProfile></SearchProfile>,
           headerShown: false,
           tabBarIcon: () => (
-            <TouchableOpacity>
-              <FontAwesome5
-                name="search"
-                size={20}
-                color="white"
-                iconStyle="solid"
-              />
-            </TouchableOpacity>
+            <FontAwesome5
+              name="search"
+              size={20}
+              color="white"
+              iconStyle="solid"
+            />
           ),
         }}
       />
@@ -96,18 +93,18 @@ const MainTabs = () => {
         component={Profile}
         options={{
           headerTitleAlign: 'center',
-          headerTitle: 'dipendra_patel934',
+          headerTitle: user?.username || 'Unknown',
           headerTitleStyle: { fontSize: 20 },
           headerLeft: () => <CreatePostBtn></CreatePostBtn>,
           headerRight: () => <MessageContacts></MessageContacts>,
           tabBarIcon: ({ focused }) => (
             <Image
-              source={require('../../src/assets/images/user1.jpg')}
+              source={{ uri: user?.avtar }}
               style={{
-                height: 28,
-                width: 28,
+                height: rh(3.5),
+                width: rh(3.5),
                 borderRadius: 50,
-                borderWidth: 2,
+                borderWidth: rw(0.3),
                 borderColor: 'white',
               }}
             ></Image>

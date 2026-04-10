@@ -11,25 +11,36 @@ import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import firestore from '@react-native-firebase/firestore';
 const SearchedProfile = ({ route }) => {
   const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState();
+  const [userData, setUserData] = useState({});
   console.log('userData', userData);
   useEffect(() => {
     const id = route?.params?.id;
     const getUserProfile = async () => {
       try {
-        const userDocument = await firestore()
-          .collection('users')
-          .doc(id)
-          .get();
+        const userDetails = await firestore().collection('users').doc(id).get();
 
         const userFollow = await firestore()
           .collection('users')
           .doc(id)
-          .collection('Followers')
+          .collection('followers')
           .get();
 
-        console.log('user data', userDocument, userFollow._docs);
+        const userFollowing = await firestore()
+          .collection('users')
+          .doc(id)
+          .collection('followings')
+          .get();
+
+        const usersPosts = await firestore().collection('posts');
+        const user = userDetails.data();
+        console.log('user data', user, userFollow.size, userFollowing.size);
         setLoading(false);
+
+        setUserData({
+          ...user,
+          followersCount: userFollow.size,
+          followingCount: userFollowing.size,
+        });
       } catch (error) {
         console.error('Error While Getting User Data', error);
       }
@@ -100,14 +111,18 @@ const SearchedProfile = ({ route }) => {
                 <Text style={{ color: 'white', fontWeight: '800' }}>Posts</Text>
               </View>
               <View>
-                <Text style={{ color: 'white', fontWeight: '800' }}>0</Text>
+                <Text style={{ color: 'white', fontWeight: '800' }}>
+                  {userData?.followersCount || 0}
+                </Text>
                 <Text style={{ color: 'white', fontWeight: '800' }}>
                   followers
                 </Text>
               </View>
 
               <View>
-                <Text style={{ color: 'white', fontWeight: '800' }}>0</Text>
+                <Text style={{ color: 'white', fontWeight: '800' }}>
+                  {userData?.followingCount || 0}
+                </Text>
                 <Text style={{ color: 'white', fontWeight: '800' }}>
                   following
                 </Text>

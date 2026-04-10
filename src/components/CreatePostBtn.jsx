@@ -8,7 +8,7 @@ const CreatePostBtn = () => {
   return (
     <>
       <TouchableOpacity
-        onPress={() => navigation.navigate('CreatePost')}
+        onPress={() => navigation.navigate('CreatePostStep1')}
         style={{ marginLeft: 10 }}
       >
         <FontAwesome5 name="plus" size={25} color="white" iconStyle="solid" />

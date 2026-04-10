@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import React from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5/static';
+import { rf, rh, rw } from '../../helper/responsive';
 
 const Message = ({ navigation }) => {
   const messages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
@@ -22,7 +23,7 @@ const Message = ({ navigation }) => {
         renderItem={({ item }) => (
           <TouchableHighlight
             style={{
-              marginBottom: 20,
+              marginBottom: rh(2),
             }}
             activeOpacity={0.6}
             underlayColor="#263238"
@@ -34,29 +35,45 @@ const Message = ({ navigation }) => {
           >
             {/* profile */}
             <View
-              style={{ flexDirection: 'row', gap: 20, marginHorizontal: 20 }}
+              style={{
+                flexDirection: 'row',
+                gap: 20,
+                marginHorizontal: rw(5),
+              }}
             >
               <View
                 style={{
-                  height: 60,
-                  width: 60,
+                  height: rh(6),
+                  width: rh(6),
                   backgroundColor: '#263238',
                   borderRadius: 50,
                 }}
               >
                 <Image
                   source={require('../../assets/images/user1.jpg')}
-                  style={{ height: 60, width: 60, borderRadius: 50 }}
+                  style={{ height: rh(6), width: rh(6), borderRadius: 50 }}
                 ></Image>
               </View>
 
               {/* name and last message */}
 
               <View style={{ justifyContent: 'center' }}>
-                <Text style={{ color: 'white', fontWeight: '500' }}>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: '500',
+                    fontSize: rf(1.8),
+                  }}
+                >
                   dipendra
                 </Text>
-                <Text style={{ color: 'white', fontWeight: '500' }}>
+                <Text
+                  style={{
+                    color: 'white',
+                    fontWeight: '500',
+                    fontSize: rf(1.8),
+                  }}
+                >
                   4+ new messages
                 </Text>
               </View>
@@ -64,14 +81,14 @@ const Message = ({ navigation }) => {
           </TouchableHighlight>
         )}
         ListHeaderComponent={
-          <View style={{ gap: 10, marginBottom: 20 }}>
+          <View style={{ gap: 10, marginBottom: rh(3) }}>
             <View
               style={{
                 flexDirection: 'row',
                 alignItems: 'center',
                 backgroundColor: '#263238',
-                marginHorizontal: 10,
-                paddingHorizontal: 20,
+                marginHorizontal: rw(5),
+                paddingHorizontal: rw(5),
                 borderRadius: 10,
                 gap: 10,
                 elevation: 5,
@@ -84,7 +101,7 @@ const Message = ({ navigation }) => {
               ></FontAwesome5>
               <TextInput
                 placeholder="Search"
-                style={{ fontWeight: '800' }}
+                style={{ fontWeight: '800', fontSize: rf(2) }}
               ></TextInput>
             </View>
 
@@ -92,7 +109,8 @@ const Message = ({ navigation }) => {
               style={{
                 color: 'white',
                 fontWeight: '800',
-                marginHorizontal: 20,
+                marginHorizontal: rw(5),
+                fontSize: rf(1.9),
               }}
             >
               Messages

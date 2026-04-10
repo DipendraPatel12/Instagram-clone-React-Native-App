@@ -7,7 +7,7 @@ import {
   View,
 } from 'react-native';
 import React, { useState } from 'react';
-
+import { rf, rh } from '../../helper/responsive';
 
 const SignUpWithEmail = ({ navigation, route }) => {
   const username = route?.params?.username;
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 15,
     fontWeight: '500',
-    marginBottom: 15,
+    marginBottom: rh(1.5),
   },
   textInputStyle: {
     borderColor: 'grey',
@@ -111,7 +111,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'white',
     fontWeight: '500',
-    fontSize: 15,
+    fontSize: rf(2),
   },
   signupBtn: {
     backgroundColor: '#37474F',
@@ -121,6 +121,6 @@ const styles = StyleSheet.create({
   alreadyAccountText: {
     color: '#42A5F5',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: rh(4),
   },
 });

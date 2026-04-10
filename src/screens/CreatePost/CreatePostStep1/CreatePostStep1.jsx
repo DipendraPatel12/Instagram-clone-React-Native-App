@@ -2,14 +2,46 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { FlashList } from '@shopify/flash-list';
-import EmptyData from '../../components/EmptyData';
+import EmptyData from '../../../components/EmptyData';
 
-const CreatePost = () => {
+import { useNavigation } from '@react-navigation/native';
+const CreatePostStep1 = ({ route }) => {
   const [data, setData] = useState([]);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [endCursor, setEndCursor] = useState();
-  const [previewImage, setPreviewImage] = useState();
-  
+  const [previewImage, setPreviewImage] = useState({ uri: '', type: '' });
+  const navigation = useNavigation();
+  console.warn('previewImage', previewImage);
+  const from = route?.params?.from;
+  useEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => {
+            if (!previewImage.uri) return;
+
+            if (from) {
+              navigation.navigate('EditProfile', {
+                img: previewImage.uri,
+                type: previewImage.type,
+              });
+            } else {
+              navigation.navigate('CreatePostStep2', {
+                img: previewImage.uri,
+                type: previewImage.type,
+              });
+            }
+          }}
+          style={{ marginRight: 15 }}
+        >
+          <Text style={{ color: '#2196F3', fontWeight: '600', fontSize: 20 }}>
+            Next
+          </Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, previewImage]);
+
   useEffect(() => {
     const getPhotos = async () => {
       const response = await CameraRoll.getPhotos({
@@ -87,7 +119,7 @@ const CreatePost = () => {
 
       <View style={{ justifyContent: 'center', alignItems: 'center' }}>
         <Image
-          source={{ uri: previewImage }}
+          source={{ uri: previewImage?.uri }}
           style={{ height: 300, width: 300 }}
         ></Image>
       </View>
@@ -97,7 +129,12 @@ const CreatePost = () => {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={{ position: 'relative' }}
-            onPress={() => setPreviewImage(item?.node?.image?.uri)}
+            onPress={() =>
+              setPreviewImage({
+                uri: item?.node?.image?.uri,
+                type: item?.node?.type,
+              })
+            }
           >
             <Image
               source={{ uri: item?.node?.image?.uri }}
@@ -127,6 +164,6 @@ const CreatePost = () => {
   );
 };
 
-export default CreatePost;
+export default CreatePostStep1;
 
 const styles = StyleSheet.create({});
