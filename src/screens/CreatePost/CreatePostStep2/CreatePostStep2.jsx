@@ -23,7 +23,7 @@ const CreatePostStep2 = ({ route, navigation }) => {
 
   const { user } = useSelector(state => state.auth);
 
-  console.log('user from redux ', user);
+  // console.log('user from redux ', user);
 
   const [uploading, setUploading] = useState(false);
   console.warn(img, type);

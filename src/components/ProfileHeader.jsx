@@ -1,7 +1,8 @@
 import { StyleSheet, Text, View, Image } from 'react-native';
 import React from 'react';
+import { rf, rh } from '../helper/responsive';
 
-const ProfileHeader = ({ username }) => {
+const ProfileHeader = ({ name, username, avatar }) => {
   return (
     <View
       style={{
@@ -12,22 +13,26 @@ const ProfileHeader = ({ username }) => {
     >
       <View
         style={{
-          height: 40,
-          width: 40,
+          height: rh(5),
+          width: rh(5),
           backgroundColor: 'grey',
           borderRadius: 50,
         }}
       >
         <Image
-          source={require('../assets/images/user1.jpg')}
-          style={{ height: 40, width: 40, borderRadius: 50 }}
-          resizeMode="contain"
+          source={{ uri: avatar }}
+          style={{ height: rh(5), width: rh(5), borderRadius: 50 }}
+          resizeMode="cover"
         ></Image>
       </View>
 
       <View>
-        <Text style={{ color: 'white', fontWeight: '500' }}>{username}</Text>
-        <Text style={{ color: 'grey', fontWeight: '500' }}>dipendra@123</Text>
+        <Text style={{ color: 'white', fontWeight: '500', fontSize: rf(1.8) }}>
+          {name}
+        </Text>
+        <Text style={{ color: 'grey', fontWeight: '500', fontSize: rf(1.8) }}>
+          {username}
+        </Text>
       </View>
     </View>
   );

@@ -11,9 +11,9 @@ import React, { use, useEffect, useState } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import StoriesSlider from '../../components/StoriesSlider';
 import EmptyData from '../../components/EmptyData';
-import firestore from '@react-native-firebase/firestore';
+import firestore, { doc } from '@react-native-firebase/firestore';
 import { rf, rh, rw } from '../../helper/responsive';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { getUserProfile } from '../../redux/slices/authSlice';
 import { getAuth } from '@react-native-firebase/auth';
 const Home = ({ navigation }) => {
@@ -24,18 +24,96 @@ const Home = ({ navigation }) => {
   const [showMore, setShowMore] = useState(false);
   const [selectedShowMoreIndex, setSelectedShowMoreIndex] = useState();
   const [allPost, setAllPost] = useState([]);
-  const user = getAuth().currentUser._user;
-  console.log('user in home ', user);
+  const [allStories, setAllStories] = useState([]);
+  const loggedInUser = getAuth().currentUser._user;
+  const { user } = useSelector(state => state.auth);
+  // console.log('user in home ', loggedInUser);
+  // console.log('storeis', allStories);
   const Post = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  console.log(allPost);
+  // console.log(allPost);
   useEffect(() => {
     getPosts();
-    dispatch(getUserProfile(user.uid));
+    getStories();
+    dispatch(getUserProfile(loggedInUser.uid));
   }, []);
   const getPosts = async () => {
-    const posts = await firestore().collection('posts').get();
-    console.log('data from posts collection', posts._docs);
-    setAllPost(posts._docs);
+    const snapshot = await firestore().collection('posts').get();
+
+    const postsData = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+
+    setAllPost(postsData);
+  };
+  // const getStories = async () => {
+  //   const now = new Date();
+
+  //   const snapshot = await firestore()
+  //     .collection('stories')
+  //     .where('expiresAt', '>', now)
+  //     .get();
+
+  //   const storiesData = snapshot.docs.map(doc => ({
+  //     id: doc.id,
+  //     ...doc.data(),
+  //   }));
+  //   // const formattedStories = [
+  //   //   {
+  //   //     isMyStory: true,
+  //   //     avatar: user?.avtar,
+  //   //     user_id: user?.id,
+  //   //   },
+  //   //   ...storiesData,
+  //   // ];
+  //   const myStory = storiesData.find(st => st.user_id == user.id);
+  //   const otherStories = storiesData.filter(st => st.user_id != user.id);
+  //   const formattedStories = [
+  //     {
+  //       isMyStory: true,
+  //       ...myStory,
+  //     },
+  //     ...otherStories,
+  //   ];
+
+  //   setAllStories(formattedStories);
+  // };
+
+  const getStories = async () => {
+    const docs = await firestore().collection('stories').get();
+    const now = new Date();
+
+    const storyPromises = docs.docs.map(async doc => {
+      const snapshot = await firestore()
+        .collection('stories')
+        .doc(doc.id)
+        .collection('list')
+        .where('expiresAt', '>', now)
+        .get();
+
+      return snapshot.docs.map(ls => ({
+        id: ls.id,
+        ...ls.data(),
+      }));
+    });
+
+    const results = await Promise.all(storyPromises);
+    const store = results.flat();
+
+    console.log('Stories from Home ', store);
+
+    const myStory = store.find(st => st.user_id == user.id);
+    const otherStories = store.filter(st => st.user_id != user.id);
+
+    const formattedStories = [
+      {
+        isMyStory: true,
+        ...myStory,
+      },
+      ...otherStories,
+    ];
+
+    setAllStories(formattedStories);
   };
   const onRefresh = async () => {
     setRefreshing(true);
@@ -77,7 +155,8 @@ const Home = ({ navigation }) => {
                   activeOpacity={0.8}
                   onPress={() =>
                     navigation.navigate('SearchedProfile', {
-                      id: item?._data?.uid,
+                      id: item?.user_id,
+                      username: item?.username,
                     })
                   }
                 >
@@ -90,13 +169,13 @@ const Home = ({ navigation }) => {
                     }}
                   >
                     <Image
-                      source={{ uri: item?._data?.post_media_url }}
+                      source={{ uri: item?.post_media_url }}
                       style={{ height: rh(6), width: rh(6), borderRadius: 50 }}
                     ></Image>
                   </View>
                   <View>
                     <Text style={{ color: 'white' }}>
-                      {item?._data?.username || 'Unknown'}
+                      {item?.username || 'Unknown'}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -114,7 +193,7 @@ const Home = ({ navigation }) => {
               {/* image */}
               <View style={{ height: rh(50), backgroundColor: '#37474F' }}>
                 <Image
-                  source={{ uri: item?._data?.post_media_url }}
+                  source={{ uri: item?.post_media_url }}
                   style={{ height: rh(50), width: rw(100) }}
                   resizeMode="cover"
                 ></Image>
@@ -220,9 +299,9 @@ const Home = ({ navigation }) => {
                 <View>
                   <Text style={{ color: 'white', fontSize: rf(1.8) }}>
                     {showMore && selectedShowMoreIndex === index
-                      ? `${item?._data?.content} `
-                      : `${item?._data?.content.substring(0, 90)}`}
-                    {item?._data?.content.length > 90 && (
+                      ? `${item?.content} `
+                      : `${item?.content.substring(0, 90)}`}
+                    {item?.content.length > 90 && (
                       <Text
                         style={{
                           justifyContent: 'center',
@@ -245,7 +324,9 @@ const Home = ({ navigation }) => {
               </View>
             </View>
           )}
-          ListHeaderComponent={<StoriesSlider></StoriesSlider>}
+          ListHeaderComponent={
+            <StoriesSlider stories={allStories}></StoriesSlider>
+          }
           ListEmptyComponent={<EmptyData title={'Post'}></EmptyData>}
           contentContainerStyle={{
             flexGrow: 1,

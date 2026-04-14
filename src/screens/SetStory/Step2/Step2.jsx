@@ -2,9 +2,34 @@ import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { rf, rh, rw } from '../../../helper/responsive';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
-
+import { useSelector } from 'react-redux';
+import { uploadToCloudinary } from '../../../services/cloudinary';
+import firestore from '@react-native-firebase/firestore';
 const Step2 = ({ route, navigation }) => {
-  const { img, type } = route?.params || '';
+  const { url, type } = route?.params || '';
+  const { user } = useSelector(state => state.auth);
+
+  const postStory = async () => {
+    // console.log('called');
+    const now = new Date();
+    const storyUrl = await uploadToCloudinary(url, type);
+    await firestore()
+      .collection('stories')
+      .doc(user.id)
+      .collection('list')
+      .add({
+        user_id: user.id,
+        username: user.username,
+        avatar: user.avtar || '',
+        story_url: storyUrl,
+        createdAt: firestore.FieldValue.serverTimestamp(),
+        expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+      });
+    navigation.navigate('MainTabs', {
+      screen: 'Home',
+    });
+  };
+
   return (
     <View
       style={{
@@ -45,7 +70,7 @@ const Step2 = ({ route, navigation }) => {
       {/* image */}
       <View>
         <Image
-          source={{ uri: img }}
+          source={{ uri: url }}
           style={{ width: rw(100), height: rh(80), borderRadius: 30 }}
         ></Image>
       </View>
@@ -68,6 +93,7 @@ const Step2 = ({ route, navigation }) => {
             borderRadius: 50,
           }}
           activeOpacity={0.8}
+          onPress={postStory}
         >
           <FontAwesome5
             name="arrow-right"

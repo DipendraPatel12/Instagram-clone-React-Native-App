@@ -14,7 +14,7 @@ const SetStory = ({ navigation }) => {
         first: 25,
         assetType: 'All',
       });
-      console.log('Photos', response);
+      // console.log('Photos', response);
       setHasNextPage(response?.page_info?.has_next_page);
       setEndCursor(response?.page_info?.end_cursor);
       setData(response?.edges);
@@ -30,13 +30,13 @@ const SetStory = ({ navigation }) => {
       assetType: 'All',
     });
 
-    console.log('respose from loadmore fn. ', response);
+    // console.log('respose from loadmore fn. ', response);
     setEndCursor(response?.page_info?.end_cursor);
     setHasNextPage(response?.page_info?.has_next_page);
     setData(prev => [...prev, ...response?.edges]);
   };
 
-  console.log('data', data);
+  // console.log('data', data);
 
   const dData = [1, 2, 3, 4, 5];
   return (
@@ -89,7 +89,7 @@ const SetStory = ({ navigation }) => {
             style={{ position: 'relative' }}
             onPress={() =>
               navigation.navigate('Step2', {
-                img: item?.node?.image?.uri,
+                url: item?.node?.image?.uri,
                 type: item?.node?.type,
               })
             }

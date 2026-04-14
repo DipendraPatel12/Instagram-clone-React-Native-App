@@ -5,7 +5,7 @@ export const getUserProfile = createAsyncThunk(
     "auth/getUserProfile",
     async (id, { rejectWithValue }) => {
         try {
-            console.log("Api Called For Get User Profile", id);
+            // console.log("Api Called For Get User Profile", id);
 
             const response = await firestore()
                 .collection('users')
@@ -18,7 +18,7 @@ export const getUserProfile = createAsyncThunk(
 
             const userPost = await firestore().collection('posts').where('user_id', '==', id).get();
 
-            console.log("userPost", userPost)
+            // console.log("userPost", userPost)
 
             const userFollow = await firestore()
                 .collection('users')
@@ -27,17 +27,17 @@ export const getUserProfile = createAsyncThunk(
                 .get();
 
 
-            console.log(userFollow)
+            // console.log(userFollow)
             const userFollowing = await firestore()
                 .collection('users')
                 .doc(id)
                 .collection('following')
                 .get();
 
-            console.log(userFollowing)
+            // console.log(userFollowing)
             const data = response.data();
 
-            console.log("get User profile res", data, userFollow.size, userFollowing.size, userPost.size);
+            // console.log("get User profile res", data, userFollow.size, userFollowing.size, userPost.size);
 
             return {
                 ...data,

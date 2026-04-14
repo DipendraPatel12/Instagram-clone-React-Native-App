@@ -17,7 +17,7 @@ import CloseBtn from '../components/CloseBtn';
 import ProfileHeader from '../components/ProfileHeader';
 import SetUsername from '../screens/SetUsername/SetUsername';
 import SearchedProfile from '../screens/SearchedProfile/SearchedProfile';
-
+import FullScreenStory from '../screens/SetStory/FullScreenStory/FullScreenStory';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 
 import MainTabs from '../navigations/MainTabs';
@@ -128,7 +128,11 @@ const StackNavigation = ({ navigation }) => {
             headerStyle: { backgroundColor: 'black' },
             headerTintColor: 'white',
             headerTitle: () => (
-              <ProfileHeader username={route?.params?.username}></ProfileHeader>
+              <ProfileHeader
+                avatar={route?.params?.avatar}
+                username={route?.params?.username}
+                name={route?.params?.name}
+              ></ProfileHeader>
             ),
           })}
         ></Stack.Screen>
@@ -151,6 +155,12 @@ const StackNavigation = ({ navigation }) => {
         <Stack.Screen
           name="Step2"
           component={Step2}
+          options={{ headerShown: false }}
+        ></Stack.Screen>
+
+        <Stack.Screen
+          name="FullScreenStory"
+          component={FullScreenStory}
           options={{ headerShown: false }}
         ></Stack.Screen>
 

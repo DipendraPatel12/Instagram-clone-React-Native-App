@@ -1,7 +1,7 @@
 import { CLOUDINARY_CONFIG } from '../config/cloudinaryConfig';
 
 export const uploadToCloudinary = async (fileUri, type = 'image/jpeg') => {
-  console.log("called");
+  // console.log("called");
 
   const data = new FormData();
 
@@ -26,7 +26,7 @@ export const uploadToCloudinary = async (fileUri, type = 'image/jpeg') => {
     });
 
     const result = await res.json();
-    console.log("resu", result);
+    // console.log("resu", result);
 
     return result.secure_url;
   } catch (error) {

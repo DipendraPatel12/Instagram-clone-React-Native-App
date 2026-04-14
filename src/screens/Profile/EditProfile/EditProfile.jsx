@@ -27,11 +27,11 @@ const EditProfile = ({ navigation, route }) => {
     avtar: '',
   });
 
-  console.log('userData', userData);
+  // console.log('userData', userData);
 
   const updateProfile = async () => {
     try {
-      console.log('update fn called');
+      // console.log('update fn called');
       const url = await uploadToCloudinary(previewImage, type);
       const updatedData = { ...userData, avtar: url };
       const data = await firestore()

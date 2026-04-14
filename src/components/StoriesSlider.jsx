@@ -12,8 +12,10 @@ import { useNavigation } from '@react-navigation/native';
 import { rf, rh, rw } from '../helper/responsive';
 import { useSelector } from 'react-redux';
 
-const StoriesSlider = () => {
-  const stories = [1, 2, 3, 4, 5, 6, 7, 8];
+const StoriesSlider = ({ stories }) => {
+  // const stories = [1, 2, 3, 4, 5, 6, 7, 8];
+
+  console.warn('stories', stories);
   const navigation = useNavigation();
 
   const { user } = useSelector(state => state.auth);
@@ -31,19 +33,30 @@ const StoriesSlider = () => {
           <View style={{ marginRight: rw(5) }}>
             <TouchableOpacity
               style={
-                index == 0
+                item.isMyStory
                   ? { ...styles.storyStyle }
                   : { ...styles.storyStyle, ...styles.userStory }
               }
               onPress={() => {
-                if (index == 0) {
+                if (item.isMyStory) {
                   navigation.navigate('SetStory');
+                } else {
+                  navigation.navigate('FullScreenStory', {
+                    story: item,
+                  });
                 }
               }}
             >
               <Image
-                source={{ uri: index === 0 ? user?.avtar : '' }}
-                style={{ height: rh(10), width: rh(10), borderRadius: 50 }}
+                source={{
+                  uri: item.isMyStory ? user.avtar : item?.avatar,
+                }}
+                style={{
+                  height: rh(9.5),
+                  width: rh(9.5),
+                  borderRadius: 50,
+                  backgroundColor: 'grey',
+                }}
               ></Image>
             </TouchableOpacity>
 
@@ -81,7 +94,7 @@ const StoriesSlider = () => {
             <Text
               style={{ color: 'white', textAlign: 'center', fontSize: rf(1.7) }}
             >
-              {index === 0 ? 'your story' : ' Dipendra'}
+              {item.user_id === user.id ? 'Your story' : item.username}
             </Text>
           </View>
         )}

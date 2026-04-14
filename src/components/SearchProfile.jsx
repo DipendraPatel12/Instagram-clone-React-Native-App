@@ -18,12 +18,12 @@ const SearchProfile = ({ setResults }) => {
         .where('username', '==', searchText)
         .get();
 
-      console.log(res);
+      // console.log(res);
       const users = res.docs.map(doc => ({
         ...doc._data,
       }));
 
-      console.log('Users:', users);
+      // console.log('Users:', users);
       setResults(users);
     } catch (error) {
       console.error('Error while searching..', error);

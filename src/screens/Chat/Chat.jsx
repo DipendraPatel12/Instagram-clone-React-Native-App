@@ -7,12 +7,53 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import Camera from '../../components/Camera';
+import firestore, { Timestamp } from '@react-native-firebase/firestore';
+import { useSelector } from 'react-redux';
+import { rh, rw } from '../../helper/responsive';
 
-const Chat = () => {
+const Chat = ({ route }) => {
+  const [messageText, setMessageText] = useState('');
+  const { user } = useSelector(state => state.auth);
+  const chatId = route?.params?.chatId;
+  const reverseChatId = route?.params?.reverseChatId;
+  const avatar = route?.params?.avatar;
+  useEffect(() => {
+    getMessage();
+  }, []);
+  const getMessage = async () => {
+    try {
+      const chatRef = firestore().collection('chats');
+
+      const chatIdCheck = await chatRef.doc(chatId).get();
+      const reverseChatIdCheck = await chatRef.doc(reverseChatId).get();
+      if (chatIdCheck.exists()) {
+        const data = await firestore()
+          .collection('chats')
+          .doc(chatId)
+          .collection('message')
+          .get();
+
+        console.log('chatId res ', data);
+        return;
+      }
+      if (reverseChatIdCheck.exists()) {
+        const data = await firestore()
+          .collection('chats')
+          .doc(reverseChatIdCheck)
+          .collection('message')
+          .get();
+
+        console.log('reversechatId res ', data);
+        return;
+      }
+    } catch (error) {
+      console.error('Error while Getting Messages');
+    }
+  };
   const messages = [
     'hii',
     'hello',
@@ -31,6 +72,32 @@ const Chat = () => {
     'ok',
     'lets go sfsd sdf sfsdf dfgsd fsdf sdf sfsd f',
   ];
+
+  const sendMessage = async () => {
+    try {
+      const chatRef = firestore().collection('chats');
+
+      const chatIdCheck = await chatRef.doc(chatId).get();
+      const reverseChatIdCheck = await chatRef.doc(reverseChatId).get();
+
+      if (chatIdCheck.exists()) {
+        await firestore()
+          .collection('chats')
+          .doc(chatId)
+          .collection('message')
+          .add({
+            senderId: user.id,
+            senderName: user.name,
+            content: messageText,
+            sendingTime: firestore.FieldValue.serverTimestamp(),
+          });
+      }
+
+      setMessageText('');
+    } catch (error) {
+      console.error('Error while Sending Messages ', error);
+    }
+  };
   return (
     <View
       style={{
@@ -40,33 +107,37 @@ const Chat = () => {
         position: 'relative',
       }}
     >
-      <View style={{ marginTop: 10 }}>
+      <View style={{ marginTop: rh(2) }}>
         <FlatList
           data={messages}
           showsVerticalScrollIndicator={false}
           renderItem={({ item, index }) => (
-            <View style={{ marginBottom: 20, marginHorizontal: 20 }}>
+            <View style={{ marginBottom: rh(3), marginHorizontal: rw(5) }}>
               <View
                 style={{
                   flexDirection: 'row',
                   alignSelf: index % 2 == 0 ? 'flex-start' : 'flex-end',
-                  gap: 10,
+                  gap: rw(2),
                 }}
               >
                 {index % 2 == 0 && (
                   <Image
-                    source={require('../../assets/images/user1.jpg')}
-                    style={{ height: 30, width: 30, borderRadius: 50 }}
+                    source={{ uri: avatar }}
+                    style={{
+                      height: rh(5),
+                      width: rh(5),
+                      borderRadius: 50,
+                      backgroundColor: 'grey',
+                    }}
                   ></Image>
                 )}
                 <View
                   style={{
                     backgroundColor: index % 2 == 0 ? '#424242' : '#6A1B9A',
-                    paddingVertical: 5,
-                    paddingHorizontal: 10,
+                    paddingVertical: rh(1),
+                    paddingHorizontal: rw(3),
                     borderRadius: 10,
                     elevation: 5,
-                    width: '50%',
                   }}
                 >
                   <Text style={{ color: 'white' }}>{item}</Text>
@@ -111,7 +182,9 @@ const Chat = () => {
             <TextInput
               placeholder="Message..."
               placeholderTextColor="grey"
-              style={{ width: '80%' }}
+              style={{ width: '80%', color: 'white' }}
+              value={messageText}
+              onChangeText={text => setMessageText(text)}
             ></TextInput>
           </View>
 
@@ -121,6 +194,7 @@ const Chat = () => {
               padding: 5,
               borderRadius: 10,
             }}
+            onPress={sendMessage}
           >
             <Text style={{ color: 'white', fontWeight: '500' }}>Send</Text>
           </TouchableOpacity>
