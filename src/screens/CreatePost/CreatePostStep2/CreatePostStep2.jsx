@@ -8,12 +8,13 @@ import {
   TextInput,
 } from 'react-native';
 import React, { useState } from 'react';
-import { rf, rh, rw } from '../../../helper/responsive';
+
 import { uploadToCloudinary } from '../../../services/cloudinary';
 
 import firestore from '@react-native-firebase/firestore';
-import auth from '@react-native-firebase/auth';
 import { useSelector } from 'react-redux';
+import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
+import styles from './CreatePostStep2Style';
 
 const CreatePostStep2 = ({ route, navigation }) => {
   const [visible, setVisible] = useState(false);
@@ -52,65 +53,25 @@ const CreatePostStep2 = ({ route, navigation }) => {
     }
   };
   return (
-    <View
-      style={{
-        backgroundColor: 'black',
-        flex: 1,
-        justifyContent: 'space-between',
-      }}
-    >
-      <View
-        style={{
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: rh(70),
-        }}
-      >
-        <Image
-          source={{ uri: img }}
-          style={{ width: rw(100), height: rh(50) }}
-        ></Image>
-        <View
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginTop: rh(3),
-            gap: 20,
-          }}
-        >
+    <View style={styles.container}>
+      <View style={styles.previewImageContainer}>
+        <Image source={{ uri: img }} style={styles.previewImageStyle}></Image>
+        <View style={styles.contentSetter}>
           <TouchableOpacity
-            style={{
-              height: rh(6),
-              width: rw(20),
-              borderRadius: 10,
-              backgroundColor: '#263238',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
+            style={styles.textSetterBox}
             onPress={() => {
               setVisible(true);
             }}
           >
-            <Text style={{ color: 'white', fontSize: rf(2) }}>Aa</Text>
-            <Text
-              style={{ color: 'white', fontWeight: '500', fontSize: rf(1.5) }}
-            >
-              Text
-            </Text>
+            <Text style={styles.textSetterStyle}>Aa</Text>
+            <Text style={styles.textSetter2Style}>Text</Text>
           </TouchableOpacity>
 
           {text && content !== '' && (
             <>
-              <View
-                style={{
-                  backgroundColor: '#263238',
-                  width: rw(90),
-                  borderRadius: 10,
-                  flexDirection: 'row',
-                }}
-              >
-                <View style={{ width: rw(80) }}>
-                  <Text style={{ color: 'white', padding: 10 }}>{content}</Text>
+              <View style={styles.postDetailContainer}>
+                <View style={styles.showPostDescContainer}>
+                  <Text style={styles.postDetailTextStyle}>{content}</Text>
                 </View>
                 <TouchableOpacity
                   onPress={() => {
@@ -118,7 +79,14 @@ const CreatePostStep2 = ({ route, navigation }) => {
                     setText(false);
                   }}
                 >
-                  <Text style={{ color: 'white', padding: 10 }}>*</Text>
+                  <Text style={styles.removeContentStyle}>
+                    <FontAwesome5
+                      name={'trash'}
+                      color={'white'}
+                      size={10}
+                      iconStyle="solid"
+                    ></FontAwesome5>
+                  </Text>
                 </TouchableOpacity>
               </View>
             </>
@@ -126,27 +94,9 @@ const CreatePostStep2 = ({ route, navigation }) => {
         </View>
       </View>
 
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'flex-end',
-          alignItems: 'center',
-        }}
-      >
-        <TouchableOpacity
-          style={{
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#1976D2',
-            width: rw(20),
-            height: rh(5),
-            borderRadius: 10,
-            marginRight: rh(5),
-            marginBottom: rh(5),
-          }}
-          onPress={uploadPost}
-        >
-          <Text style={{ color: 'white', fontWeight: '800' }}>
+      <View style={styles.postingContainer}>
+        <TouchableOpacity style={styles.postBtnContainer} onPress={uploadPost}>
+          <Text style={styles.postTextStyle}>
             {uploading ? 'Posting...' : 'Post'}
           </Text>
         </TouchableOpacity>
@@ -157,34 +107,19 @@ const CreatePostStep2 = ({ route, navigation }) => {
         onRequestClose={() => setVisible(!visible)}
         transparent
       >
-        <View
-          style={{
-            flex: 1 / 2,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
+        <View style={styles.modalContainer}>
           <TouchableOpacity
-            style={{ position: 'absolute', top: rh(1), right: rw(8) }}
+            style={styles.doneBtnContainer}
             onPress={() => {
               setVisible(!visible);
               setText(true);
             }}
           >
-            <Text
-              style={{ color: 'white', fontWeight: '600', fontSize: rf(2.5) }}
-            >
-              Done
-            </Text>
+            <Text style={styles.doneBtnTextStyle}>Done</Text>
           </TouchableOpacity>
           <TextInput
             placeholder="write here..."
-            style={{
-              color: 'white',
-              backgroundColor: 'black',
-              marginHorizontal: rw(3),
-              borderRadius: 10,
-            }}
+            style={styles.inputTextStyle}
             multiline
             autoFocus
             value={content}
@@ -197,5 +132,3 @@ const CreatePostStep2 = ({ route, navigation }) => {
 };
 
 export default CreatePostStep2;
-
-const styles = StyleSheet.create({});

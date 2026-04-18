@@ -1,10 +1,11 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, Text, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { FlashList } from '@shopify/flash-list';
 import EmptyData from '../../../components/EmptyData';
 
 import { useNavigation } from '@react-navigation/native';
+import styles from './CreatePostStep1Style';
 const CreatePostStep1 = ({ route }) => {
   const [data, setData] = useState([]);
   const [hasNextPage, setHasNextPage] = useState(false);
@@ -75,8 +76,8 @@ const CreatePostStep1 = ({ route }) => {
 
   const dData = [1, 2, 3, 4, 5];
   return (
-    <View style={{ flex: 1, backgroundColor: '#263238' }}>
-      {!data && (
+    <View style={styles.container}>
+      {/* {!data && (
         <View
           style={{
             justifyContent: 'center',
@@ -115,12 +116,12 @@ const CreatePostStep1 = ({ route }) => {
             </Text>
           </TouchableOpacity>
         </View>
-      )}
+      )} */}
 
-      <View style={{ justifyContent: 'center', alignItems: 'center' }}>
+      <View style={styles.imagePreviewContainer}>
         <Image
           source={{ uri: previewImage?.uri }}
-          style={{ height: 300, width: 300 }}
+          style={styles.previewImageStyle}
         ></Image>
       </View>
       <FlashList
@@ -128,7 +129,7 @@ const CreatePostStep1 = ({ route }) => {
         numColumns={3}
         renderItem={({ item }) => (
           <TouchableOpacity
-            style={{ position: 'relative' }}
+            style={styles.itemContainer}
             onPress={() =>
               setPreviewImage({
                 uri: item?.node?.image?.uri,
@@ -138,20 +139,11 @@ const CreatePostStep1 = ({ route }) => {
           >
             <Image
               source={{ uri: item?.node?.image?.uri }}
-              style={{ width: 131, height: 130 }}
+              style={styles.itemImageStyle}
               resizeMode="cover"
             ></Image>
             {item?.node?.type === 'video/mp4' && (
-              <Text
-                style={{
-                  color: 'white',
-                  position: 'absolute',
-                  top: 50,
-                  left: 50,
-                }}
-              >
-                ▶️
-              </Text>
+              <Text style={styles.itemTextStyle}>▶️</Text>
             )}
           </TouchableOpacity>
         )}
@@ -165,5 +157,3 @@ const CreatePostStep1 = ({ route }) => {
 };
 
 export default CreatePostStep1;
-
-const styles = StyleSheet.create({});

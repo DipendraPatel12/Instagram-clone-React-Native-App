@@ -129,6 +129,7 @@ const StackNavigation = ({ navigation }) => {
             headerTintColor: 'white',
             headerTitle: () => (
               <ProfileHeader
+                id={route?.params?.id}
                 avatar={route?.params?.avatar}
                 username={route?.params?.username}
                 name={route?.params?.name}

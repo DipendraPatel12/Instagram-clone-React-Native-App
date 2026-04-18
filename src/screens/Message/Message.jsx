@@ -6,126 +6,129 @@ import {
   TextInput,
   TouchableHighlight,
   View,
-  KeyboardAvoidingView,
 } from 'react-native';
-import React, { useEffect } from 'react';
+import React, { use, useEffect, useState } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5/static';
 import { rf, rh, rw } from '../../helper/responsive';
 import firestore from '@react-native-firebase/firestore';
 import { useSelector } from 'react-redux';
+import { useFocusEffect } from '@react-navigation/native';
+import styles from './MessageStyle';
+import { FlashList } from '@shopify/flash-list';
 const Message = ({ navigation }) => {
+  const [searchText, setSearchText] = useState('');
+  const [chats, setChats] = useState([]);
   const { user } = useSelector(state => state.auth);
+  const [chatsHistory, setChatsHistory] = useState([]);
+
+  const handleSearch = () => {
+    if (searchText === '') {
+      return;
+    }
+    const data = chats.filter(chat =>
+      chat?.otherUser?.name.toLowerCase().startsWith(searchText.toLowerCase()),
+    );
+    setChats(data);
+  };
+
   useEffect(() => {
-    getRecentsChats();
+    handleSearch();
+  }, [searchText]);
+
+  useEffect(() => {
+    getRecentChats();
   }, []);
-  const getRecentsChats = async () => {
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setSearchText('');
+      // setChats(chatsHistory);
+      console.log('Screen is focused');
+    }, []),
+  );
+  const getRecentChats = async () => {
     try {
-      const data = await firestore().collection('chats').get();
+      const snapshot = await firestore()
+        .collection('chats')
+        .where('participants', 'array-contains', user.id)
+        .get();
 
-      const recentChatIds = data.docs.map(doc => {
-        return {
-          docId: doc.id,
-          ...doc.data(),
-        };
-      });
+      const chatsData = await Promise.all(
+        snapshot.docs.map(async doc => {
+          const chat = { id: doc.id, ...doc.data() };
 
-      let updatedIds = [];
-      recentChatIds.forEach(doc => {
-        const splitedId = doc.docId.split('-');
-        splitedId.forEach(id => {
-          if (id !== user.id) {
-            updatedIds.push(id);
-          }
-        });
-      });
-      console.log('recents chats', data, recentChatIds, updatedIds);
+          const otherUserId = chat.participants.find(id => id !== user.id);
+
+          const userDoc = await firestore()
+            .collection('users')
+            .doc(otherUserId)
+            .get();
+
+          const otherUser = userDoc.data();
+
+          return {
+            ...chat,
+            otherUserId,
+            otherUser,
+          };
+        }),
+      );
+
+      setChats(chatsData);
+      setChatsHistory(chatsData);
+      console.log(chatsData);
     } catch (error) {
-      console.error(error);
+      console.error('Error fetching chats:', error);
     }
   };
 
-  const messages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
+  // const messages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
   return (
-    <View style={{ flex: 1, backgroundColor: 'black', gap: 20 }}>
-      <FlatList
-        data={messages}
+    <View style={styles.container}>
+      <FlashList
+        data={chats}
         showsVerticalScrollIndicator={false}
-        keyboardShouldPersistTaps="handled"
         renderItem={({ item }) => (
           <TouchableHighlight
-            style={{
-              marginBottom: rh(2),
-            }}
+            style={styles.itemContainer}
             activeOpacity={0.6}
             underlayColor="#263238"
             // onPress={() => alert('Pressed!')}
 
             onPress={() =>
-              navigation.navigate('Chat', { username: 'dipendra' })
+              navigation.navigate('Chat', {
+                id: item?.otherUser?.id,
+                name: item?.otherUser?.name,
+                username: item?.otherUser?.username,
+                avatar: item?.otherUser?.avtar,
+                oppositeUserId: item?.otherUser.id,
+              })
             }
           >
             {/* profile */}
-            <View
-              style={{
-                flexDirection: 'row',
-                gap: 20,
-                marginHorizontal: rw(5),
-              }}
-            >
-              <View
-                style={{
-                  height: rh(6),
-                  width: rh(6),
-                  backgroundColor: '#263238',
-                  borderRadius: 50,
-                }}
-              >
+            <View style={styles.profileAndUsernameContainer}>
+              <View style={styles.profileImageContainer}>
                 <Image
-                  source={require('../../assets/images/user1.jpg')}
-                  style={{ height: rh(6), width: rh(6), borderRadius: 50 }}
+                  source={{ uri: item?.otherUser?.avtar }}
+                  style={styles.imageStyle}
                 ></Image>
               </View>
 
               {/* name and last message */}
 
               <View style={{ justifyContent: 'center' }}>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '500',
-                    fontSize: rf(1.8),
-                  }}
-                >
-                  dipendra
+                <Text style={styles.usernameTextStyle}>
+                  {item?.otherUser?.name}
                 </Text>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '500',
-                    fontSize: rf(1.8),
-                  }}
-                >
-                  4+ new messages
-                </Text>
+                <Text style={styles.usernameTextStyle}>4+ new messages</Text>
               </View>
             </View>
           </TouchableHighlight>
         )}
         ListHeaderComponent={
-          <View style={{ gap: 10, marginBottom: rh(3) }}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                backgroundColor: '#263238',
-                marginHorizontal: rw(5),
-                paddingHorizontal: rw(5),
-                borderRadius: 10,
-                gap: 10,
-                elevation: 5,
-              }}
-            >
+          <View style={styles.searchBarContainer}>
+            <View style={styles.searchBarBox}>
               <FontAwesome5
                 name="search"
                 color="white"
@@ -133,27 +136,18 @@ const Message = ({ navigation }) => {
               ></FontAwesome5>
               <TextInput
                 placeholder="Search"
-                style={{ fontWeight: '800', fontSize: rf(2) }}
+                style={styles.searchBarInpuyStyle}
+                value={searchText}
+                onChangeText={text => setSearchText(text)}
               ></TextInput>
             </View>
 
-            <Text
-              style={{
-                color: 'white',
-                fontWeight: '800',
-                marginHorizontal: rw(5),
-                fontSize: rf(1.9),
-              }}
-            >
-              Messages
-            </Text>
+            <Text style={styles.messagesTextStyle}>Messages</Text>
           </View>
         }
-      ></FlatList>
+      ></FlashList>
     </View>
   );
 };
 
 export default Message;
-
-const styles = StyleSheet.create({});

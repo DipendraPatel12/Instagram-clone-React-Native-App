@@ -1,17 +1,17 @@
 import {
   FlatList,
   Image,
-  StyleSheet,
   Text,
   TextInput,
   TouchableHighlight,
   View,
 } from 'react-native';
+
 import React, { useEffect, useState } from 'react';
-import FontAwesome5 from '@react-native-vector-icons/fontawesome5/static';
-import { rf, rh, rw } from '../../helper/responsive';
+
 import firestore from '@react-native-firebase/firestore';
 import { useSelector } from 'react-redux';
+import styles from './ContactSuggestionStyle';
 const ContactSuggestion = ({ navigation }) => {
   const { user } = useSelector(state => state.auth);
   const [contacts, setContacts] = useState([]);
@@ -40,68 +40,61 @@ const ContactSuggestion = ({ navigation }) => {
   };
 
   const createChat = async item => {
-    console.log('item', item);
-    const oppositUserId = item.id;
-    const chatId = `${oppositUserId}-${user.id}`;
-    const reverseChatId = `${user.id}-${oppositUserId}`;
-
     try {
-      const chatsRef = firestore().collection('chats');
-      const chatIdCheck = await chatsRef.doc(chatId).get();
-      const reverseChatIdCheck = await chatsRef.doc(reverseChatId).get();
-      console.log(chatIdCheck, reverseChatIdCheck);
-      if (chatIdCheck.exists() || reverseChatIdCheck.exists()) {
-        console.log('alreadty');
+      const oppositUserId = item.id;
+
+      const existingChatSnapshot = await firestore()
+        .collection('chats')
+        .where('participants', 'array-contains', user.id)
+        .get();
+
+      const existingChat = existingChatSnapshot.docs.find(doc =>
+        doc.data().participants.includes(oppositUserId),
+      );
+
+      if (existingChat) {
         navigation.navigate('Chat', {
+          id: item.id,
           name: item.name,
           username: item.username,
-          chatId,
-          reverseChatId,
+          chatId: existingChat.id,
           avatar: item.avtar,
+          oppositeUserId: item.id,
         });
-        return;
       } else {
-        const data = await firestore().collection('chats').doc(chatId).set({});
+        const chatRef = firestore().collection('chats').doc();
+
+        await chatRef.set({
+          participants: [user.id, oppositUserId],
+        });
+
         navigation.navigate('Chat', {
-          chatId,
-          reverseChatId,
+          chatId: chatRef.id,
           name: item.name,
           username: item.username,
           avatar: item.avtar,
+          id: item.id,
+          oppositeUserId: item.id,
         });
-        return;
       }
     } catch (error) {
       console.error('Error while Creating Chat', error);
     }
   };
+
   return (
-    <View style={{ flex: 1, backgroundColor: 'black', gap: 20 }}>
-      <View
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          marginHorizontal: rw(5),
-          paddingHorizontal: rw(5),
-          borderRadius: 10,
-          gap: 20,
-          elevation: 5,
-        }}
-      >
-        <Text style={{ color: '#B0BEC5', fontWeight: '800', fontSize: rf(2) }}>
-          To :
-        </Text>
+    <View style={styles.contain}>
+      <View style={styles.searchBoxContainer}>
+        <Text style={styles.toTextStyle}>To :</Text>
         <TextInput
           placeholder="Search"
           placeholderTextColor={'#B0BEC5'}
-          style={{ fontWeight: '800', fontSize: rf(1.8), width: rw(73) }}
+          style={styles.inputTextStyle}
         ></TextInput>
       </View>
 
-      <View style={{ marginHorizontal: rw(5), gap: 30 }}>
-        <Text style={{ color: 'white', fontWeight: '800', fontSize: rf(2) }}>
-          Suggested
-        </Text>
+      <View style={styles.innerContainer}>
+        <Text style={styles.suggestedTextStyle}>Suggested</Text>
 
         <FlatList
           data={contacts}
@@ -109,46 +102,21 @@ const ContactSuggestion = ({ navigation }) => {
           renderItem={({ item }) => (
             <TouchableHighlight onPress={() => createChat(item)}>
               {/* profile */}
-              <View
-                style={{
-                  flexDirection: 'row',
-                  marginBottom: rh(2),
-                  gap: 20,
-                }}
-              >
-                <View
-                  style={{
-                    height: rh(7),
-                    width: rh(7),
-                    backgroundColor: '#263238',
-                    borderRadius: 50,
-                  }}
-                >
+              <View style={styles.itemContainer}>
+                <View style={styles.profileImageContainer}>
                   <Image
                     source={{ uri: item.avtar || '' }}
-                    style={{ height: rh(7), width: rh(7), borderRadius: 50 }}
+                    style={styles.profileImageStyle}
                   ></Image>
                 </View>
 
                 {/* name and last message */}
 
-                <View style={{ justifyContent: 'center' }}>
-                  <Text
-                    style={{
-                      color: 'white',
-                      fontWeight: '500',
-                      fontSize: rf(1.8),
-                    }}
-                  >
+                <View style={styles.itemDescContainer}>
+                  <Text style={styles.nameTextStyle}>
                     {item?.name ?? 'user'}
                   </Text>
-                  <Text
-                    style={{
-                      color: 'grey',
-                      fontWeight: '500',
-                      fontSize: rf(2),
-                    }}
-                  >
+                  <Text style={styles.usernameTextStyle}>
                     {item?.username ?? ''}
                   </Text>
                 </View>
@@ -173,5 +141,3 @@ const ContactSuggestion = ({ navigation }) => {
 };
 
 export default ContactSuggestion;
-
-const styles = StyleSheet.create({});

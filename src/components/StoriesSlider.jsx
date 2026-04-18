@@ -11,6 +11,7 @@ import React from 'react';
 import { useNavigation } from '@react-navigation/native';
 import { rf, rh, rw } from '../helper/responsive';
 import { useSelector } from 'react-redux';
+import { FlashList } from '@shopify/flash-list';
 
 const StoriesSlider = ({ stories }) => {
   // const stories = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -21,7 +22,7 @@ const StoriesSlider = ({ stories }) => {
   const { user } = useSelector(state => state.auth);
   return (
     <>
-      <FlatList
+      <FlashList
         data={stories}
         horizontal
         showsHorizontalScrollIndicator={false}
@@ -51,54 +52,24 @@ const StoriesSlider = ({ stories }) => {
                 source={{
                   uri: item.isMyStory ? user.avtar : item?.avatar,
                 }}
-                style={{
-                  height: rh(9.5),
-                  width: rh(9.5),
-                  borderRadius: 50,
-                  backgroundColor: 'grey',
-                }}
+                style={styles.imageStyle}
               ></Image>
             </TouchableOpacity>
 
             {index == 0 && (
               <TouchableOpacity
-                style={{
-                  position: 'absolute',
-                  bottom: rh(2),
-                  right: rw(0),
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  borderWidth: rw(0.5),
-                  borderRadius: 50,
-                  height: rh(3.5),
-                  width: rh(3.5),
-                  backgroundColor: 'white',
-                }}
+                style={styles.storyUploadContainer}
                 activeOpacity={0.8}
               >
-                <Text
-                  style={{
-                    color: 'black',
-                    fontSize: rf(2),
-                    fontWeight: '500',
-
-                    borderRadius: 50,
-                    textAlign: 'center',
-                    backgroundColor: 'white',
-                  }}
-                >
-                  +
-                </Text>
+                <Text style={styles.plusTextStyle}>+</Text>
               </TouchableOpacity>
             )}
-            <Text
-              style={{ color: 'white', textAlign: 'center', fontSize: rf(1.7) }}
-            >
+            <Text style={styles.usernameText}>
               {item.user_id === user.id ? 'Your story' : item.username}
             </Text>
           </View>
         )}
-      ></FlatList>
+      ></FlashList>
     </>
   );
 };
@@ -114,5 +85,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     position: 'relative',
+  },
+  imageStyle: {
+    height: rh(9.5),
+    width: rh(9.5),
+    borderRadius: 50,
+    backgroundColor: 'grey',
+  },
+  storyUploadContainer: {
+    position: 'absolute',
+    bottom: rh(3),
+    right: rw(1),
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: rw(0.5),
+    borderRadius: 50,
+    height: rh(3.5),
+    width: rh(3.5),
+    backgroundColor: 'white',
+  },
+  plusTextStyle: {
+    color: 'black',
+    fontSize: rf(2),
+    fontWeight: '500',
+
+    borderRadius: 50,
+    textAlign: 'center',
+    backgroundColor: 'white',
+  },
+  usernameText: {
+    color: 'white',
+    textAlign: 'center',
+    fontSize: rf(1.7),
   },
 });

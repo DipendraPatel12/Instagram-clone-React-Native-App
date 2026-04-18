@@ -1,90 +1,100 @@
 import {
-  FlatList,
   Image,
+  Pressable,
   StyleSheet,
   Text,
   TextInput,
   TouchableOpacity,
   View,
 } from 'react-native';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
-import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import Camera from '../../components/Camera';
-import firestore, { Timestamp } from '@react-native-firebase/firestore';
+import firestore from '@react-native-firebase/firestore';
 import { useSelector } from 'react-redux';
-import { rh, rw } from '../../helper/responsive';
-
+import { rf, rh, rw } from '../../helper/responsive';
+import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
+import styles from './ChatStyle';
+import { FlashList } from '@shopify/flash-list';
 const Chat = ({ route }) => {
+  const flatListRef = useRef();
   const [messageText, setMessageText] = useState('');
+  const [messages, setMessages] = useState([]);
+  const [visible, setVisible] = useState(false);
   const { user } = useSelector(state => state.auth);
-  const chatId = route?.params?.chatId;
-  const reverseChatId = route?.params?.reverseChatId;
   const avatar = route?.params?.avatar;
+  const oppositeUserId = route?.params?.oppositeUserId;
+
+  const [activeChatId, setActiveChatId] = useState(null);
+  const [selectedMessageId, setSelectedMessageId] = useState(null);
+  console.log(selectedMessageId);
+  // const messages = [
+  //   'hii',
+  //   'hello',
+  //   'How are you ?',
+  //   'i am good',
+  //   'what are doing ?',
+  //   'lets play cricket sdf sf sdfdsf df sf df d sdf sdf sdf sdf',
+  //   'what do say ?',
+  //   'ok',
+  //   'lets go sfsd sdf sfsdf dfgsd fsdf sdf sfsd f',
+  //   'How are you ?',
+  //   'i am good',
+  //   'what are doing ?',
+  //   'lets play cricket sdf sf sdfdsf df sf df d sdf sdf sdf sdf sfsdfsd fsd d',
+  //   'what do say ?',
+  //   'ok',
+  //   'lets go sfsd sdf sfsdf dfgsd fsdf sdf sfsd f',
+  // ];
+
   useEffect(() => {
     getMessage();
   }, []);
   const getMessage = async () => {
     try {
-      const chatRef = firestore().collection('chats');
+      const existingChatSnapshot = await firestore()
+        .collection('chats')
+        .where('participants', 'array-contains', user.id)
+        .get();
 
-      const chatIdCheck = await chatRef.doc(chatId).get();
-      const reverseChatIdCheck = await chatRef.doc(reverseChatId).get();
-      if (chatIdCheck.exists()) {
-        const data = await firestore()
-          .collection('chats')
-          .doc(chatId)
-          .collection('message')
-          .get();
+      const existingDoc = existingChatSnapshot.docs.find(doc =>
+        doc.data().participants.includes(oppositeUserId),
+      );
+      const existingChat = existingDoc
+        ? { id: existingDoc.id, ...existingDoc.data() }
+        : null;
 
-        console.log('chatId res ', data);
-        return;
-      }
-      if (reverseChatIdCheck.exists()) {
-        const data = await firestore()
-          .collection('chats')
-          .doc(reverseChatIdCheck)
-          .collection('message')
-          .get();
+      setActiveChatId(existingChat?.id);
 
-        console.log('reversechatId res ', data);
-        return;
-      }
+      const unsubscribe = firestore()
+        .collection('chats')
+        .doc(existingChat.id)
+        .collection('messages')
+        .orderBy('sendingTime', 'asc')
+        .onSnapshot(snapshot => {
+          const messages = snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+          setMessages(messages);
+        });
+
+      return unsubscribe;
     } catch (error) {
-      console.error('Error while Getting Messages');
+      console.error('Error fetching messages:', error);
     }
   };
-  const messages = [
-    'hii',
-    'hello',
-    'How are you ?',
-    'i am good',
-    'what are doing ?',
-    'lets play cricket sdf sf sdfdsf df sf df d sdf sdf sdf sdf',
-    'what do say ?',
-    'ok',
-    'lets go sfsd sdf sfsdf dfgsd fsdf sdf sfsd f',
-    'How are you ?',
-    'i am good',
-    'what are doing ?',
-    'lets play cricket sdf sf sdfdsf df sf df d sdf sdf sdf sdf sfsdfsd fsd d',
-    'what do say ?',
-    'ok',
-    'lets go sfsd sdf sfsdf dfgsd fsdf sdf sfsd f',
-  ];
 
   const sendMessage = async () => {
     try {
-      const chatRef = firestore().collection('chats');
+      if (messageText === '') return;
 
-      const chatIdCheck = await chatRef.doc(chatId).get();
-      const reverseChatIdCheck = await chatRef.doc(reverseChatId).get();
-
-      if (chatIdCheck.exists()) {
+      if (activeChatId) {
         await firestore()
           .collection('chats')
-          .doc(chatId)
-          .collection('message')
+          .doc(activeChatId)
+          .collection('messages')
           .add({
             senderId: user.id,
             senderName: user.name,
@@ -95,108 +105,124 @@ const Chat = ({ route }) => {
 
       setMessageText('');
     } catch (error) {
-      console.error('Error while Sending Messages ', error);
+      console.error('Error while sending message:', error);
+    }
+  };
+
+  const deleteMessage = async () => {
+    try {
+      await firestore()
+        .collection('chats')
+        .doc(activeChatId)
+        .collection('messages')
+        .doc(selectedMessageId)
+        .delete();
+      setVisible(false);
+    } catch (error) {
+      console.error('Error while deleting message:', error);
     }
   };
   return (
-    <View
-      style={{
-        flex: 1,
-        backgroundColor: 'black',
-        justifyContent: 'space-between',
-        position: 'relative',
-      }}
-    >
-      <View style={{ marginTop: rh(2) }}>
-        <FlatList
-          data={messages}
-          showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => (
-            <View style={{ marginBottom: rh(3), marginHorizontal: rw(5) }}>
-              <View
-                style={{
-                  flexDirection: 'row',
-                  alignSelf: index % 2 == 0 ? 'flex-start' : 'flex-end',
-                  gap: rw(2),
+    <View style={styles.container} onPress={() => setVisible(false)}>
+      <FlashList
+        data={messages}
+        showsVerticalScrollIndicator={false}
+        keyExtractor={item => item.id.toString()}
+        ref={flatListRef}
+        renderItem={({ item }) => (
+          <View style={styles.itemContainer}>
+            <View
+              style={{
+                flexDirection: 'row',
+                alignSelf: item.senderId == user.id ? 'flex-end' : 'flex-start',
+                gap: rw(2),
+              }}
+            >
+              {item?.senderId == oppositeUserId && (
+                <Image
+                  source={{ uri: avatar }}
+                  style={styles.profileImageStyle}
+                />
+              )}
+
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onLongPress={() => {
+                  setSelectedMessageId(item.id);
+                  setVisible(!visible);
                 }}
               >
-                {index % 2 == 0 && (
-                  <Image
-                    source={{ uri: avatar }}
-                    style={{
-                      height: rh(5),
-                      width: rh(5),
-                      borderRadius: 50,
-                      backgroundColor: 'grey',
-                    }}
-                  ></Image>
-                )}
-                <View
+                <Text
                   style={{
-                    backgroundColor: index % 2 == 0 ? '#424242' : '#6A1B9A',
-                    paddingVertical: rh(1),
-                    paddingHorizontal: rw(3),
-                    borderRadius: 10,
-                    elevation: 5,
+                    backgroundColor:
+                      item?.senderId == user.id ? '#6A1B9A' : '#424242',
+                    ...styles.messageTextStyle,
                   }}
                 >
-                  <Text style={{ color: 'white' }}>{item}</Text>
-                </View>
-              </View>
+                  {item?.content}
+                </Text>
+              </TouchableOpacity>
             </View>
-          )}
-        ></FlatList>
-      </View>
+          </View>
+        )}
+        // contentContainerStyle={{ paddingBottom: 1 }}
+        onContentSizeChange={() =>
+          flatListRef.current?.scrollToEnd({ animated: true })
+        }
+      />
 
-      <View
-        style={{
-          position: 'absolute',
-          bottom: 0,
-          backgroundColor: 'black',
-          paddingVertical: 10,
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: '#424242',
-            borderRadius: 10,
-            flexDirection: 'row',
-            marginHorizontal: 10,
-            paddingVertical: 5,
-            alignItems: 'center',
-            paddingHorizontal: 10,
-            gap: 5,
-          }}
+      {visible && (
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={() => setVisible(false)}
         >
-          <View
-            style={{
-              backgroundColor: 'grey',
-              padding: 10,
-              borderRadius: 50,
-              alignItems: 'center',
-            }}
-          >
-            <Camera></Camera>
+          <Pressable activeOpacity={1} style={styles.pressableBoxContainer}>
+            <TouchableOpacity
+              style={styles.pressableBtnContainer}
+              onPress={() => deleteMessage()}
+            >
+              <FontAwesome5
+                name="trash"
+                color={'white'}
+                size={15}
+                iconStyle="solid"
+              ></FontAwesome5>
+              <Text style={styles.btnTextStyle}> Delete</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.pressableBtnContainer}>
+              <FontAwesome5
+                name="reply"
+                color={'white'}
+                size={15}
+                iconStyle="solid"
+              ></FontAwesome5>
+              <Text style={styles.btnTextStyle}> Reply</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      )}
+
+      {/* INPUT BAR */}
+      <View style={styles.inputBoxContainer}>
+        <View style={styles.inputBoxInnerContainer}>
+          <View style={styles.cameraView}>
+            <Camera />
           </View>
-          <View style={{ width: '70%' }}>
-            <TextInput
-              placeholder="Message..."
-              placeholderTextColor="grey"
-              style={{ width: '80%', color: 'white' }}
-              value={messageText}
-              onChangeText={text => setMessageText(text)}
-            ></TextInput>
-          </View>
+
+          <TextInput
+            placeholder="Message..."
+            placeholderTextColor="grey"
+            style={styles.inputTextStyle}
+            value={messageText}
+            onChangeText={setMessageText}
+          />
 
           <TouchableOpacity
-            style={{
-              backgroundColor: '#6A1B9A',
-              padding: 5,
-              borderRadius: 10,
-            }}
+            style={styles.sendBtnContainer}
             onPress={sendMessage}
           >
-            <Text style={{ color: 'white', fontWeight: '500' }}>Send</Text>
+            <Text style={styles.sendTextStyle}>Send</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -205,5 +231,3 @@ const Chat = ({ route }) => {
 };
 
 export default Chat;
-
-const styles = StyleSheet.create({});

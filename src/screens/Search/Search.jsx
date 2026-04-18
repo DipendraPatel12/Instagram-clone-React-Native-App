@@ -8,24 +8,20 @@ import {
 import React, { useState } from 'react';
 import SearchProfile from '../../components/SearchProfile';
 import { FlashList } from '@shopify/flash-list';
-import EmptyData from '../../components/EmptyData';
-import { rh, rw } from '../../helper/responsive';
-
+import { rh, rw, rf } from '../../helper/responsive';
+import styles from './SearchStyle';
 const Search = ({ navigation }) => {
   const [results, setResults] = useState([]);
   // console.log('result in search PAge ', results);
-  const data = [1, 2, 3, 4, 5];
+  // const data = [1, 2, 3, 4, 5];
   return (
-    <View style={{ flex: 1, backgroundColor: 'black' }}>
+    <View style={styles.container}>
       <SearchProfile setResults={setResults}></SearchProfile>
       <FlashList
         data={results}
         renderItem={({ item }) => (
           <TouchableHighlight
-            style={{
-              marginBottom: rh(2),
-              paddingHorizontal: 20,
-            }}
+            style={styles.itemContainer}
             activeOpacity={0.6}
             underlayColor="#263238"
             // onPress={() => alert('Pressed!')}
@@ -37,28 +33,15 @@ const Search = ({ navigation }) => {
               })
             }
           >
-            <View
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                gap: rw(5),
-              }}
-            >
+            <View style={styles.profileContainer}>
               <Image
                 source={{ uri: item.avtar }}
-                style={{
-                  height: rh(7),
-                  width: rh(7),
-                  backgroundColor: 'grey',
-                  borderRadius: 50,
-                }}
+                style={styles.imageStyle}
                 resizeMode="cover"
               ></Image>
               <View>
-                <Text style={{ color: 'white', fontWeight: '500' }}>
-                  {item.username || ''}
-                </Text>
-                <Text style={{ color: 'grey' }}>
+                <Text style={styles.usernameText}>{item.username || ''}</Text>
+                <Text style={styles.contentText}>
                   followed by martin,40+ others
                 </Text>
               </View>
@@ -84,5 +67,3 @@ const Search = ({ navigation }) => {
 };
 
 export default Search;
-
-const styles = StyleSheet.create({});

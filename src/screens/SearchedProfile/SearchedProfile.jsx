@@ -1,5 +1,4 @@
 import {
-  StyleSheet,
   Text,
   View,
   Image,
@@ -11,12 +10,16 @@ import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import firestore from '@react-native-firebase/firestore';
 import { useSelector } from 'react-redux';
 import { rf, rh, rw } from '../../helper/responsive';
-const SearchedProfile = ({ route }) => {
+import styles from './SearchedProfileStyle';
+const SearchedProfile = ({ route, navigation }) => {
   const id = route?.params?.id;
   const [loading, setLoading] = useState(true);
   const [userData, setUserData] = useState({});
 
-  const [justFollowed, setJustFollowed] = useState(false);
+  const [followed, setFollowed] = useState(false);
+
+  const [userFollowerDocs, setUserFollowerDocs] = useState([]);
+  console.log('userFollowerDocs', userFollowerDocs);
 
   const { user } = useSelector(state => state.auth);
   // console.log('userData', userData);
@@ -30,6 +33,16 @@ const SearchedProfile = ({ route }) => {
           .doc(id)
           .collection('followers')
           .get();
+
+        setUserFollowerDocs(userFollow);
+
+        userFollow.docs.forEach(doc => {
+          if (doc === user?.id);
+          {
+            setFollowed(true);
+            return;
+          }
+        });
 
         const userFollowing = await firestore()
           .collection('users')
@@ -51,6 +64,8 @@ const SearchedProfile = ({ route }) => {
           followersCount: userFollow.size,
           followingCount: userFollowing.size,
         });
+
+        console.log('searched Pro ', userFollow, userFollowing);
       } catch (error) {
         console.error('Error While Getting User Data', error);
       }
@@ -61,26 +76,21 @@ const SearchedProfile = ({ route }) => {
 
   const followUser = async () => {
     try {
-      const snapshot = await firestore()
+      await firestore()
         .collection('users')
         .doc(id)
         .collection('followers')
-        .where('id', '==', user.id)
-        .get();
+        .doc(user.id)
+        .set({});
 
-      snapshot.forEach(doc => {
-        console.warn(doc);
-      });
-      // console.warn(' i am exists or not', check,check._docs());
+      await firestore()
+        .collection('users')
+        .doc(user.id)
+        .collection('followings')
+        .doc(id)
+        .set({});
 
-      // const res = await firestore()
-      //   .collection('users')
-      //   .doc(id)
-      //   .collection('followers')
-      //   .add({ id: user.id });
-
-      // setJustFollowed(true);
-      // console.warn('userfollow fn called', res);
+      console.log('followed');
     } catch (error) {
       console.error('Error while Following user', error);
     }
@@ -101,24 +111,16 @@ const SearchedProfile = ({ route }) => {
     );
   }
   return (
-    <View style={{ flex: 1, backgroundColor: 'black' }}>
-      <View style={{ marginHorizontal: rw(5), marginTop: rh(1) }}>
-        <View style={{ flexDirection: 'row', gap: rw(6) }}>
-          <View
-            style={{
-              height: rh(10),
-              width: rh(10),
-              backgroundColor: 'white',
-              borderRadius: 50,
-              position: 'relative',
-            }}
-          >
+    <View style={styles.container}>
+      <View style={styles.profileAndCountContainer}>
+        <View style={styles.profileCountInnerContainer}>
+          <View style={styles.profileImageContainer}>
             <Image
               source={{ uri: userData?.avtar }}
-              style={{ height: rh(10), width: rh(10), borderRadius: 50 }}
+              style={styles.profileImageStyle}
               resizeMode="cover"
             ></Image>
-            <TouchableOpacity
+            {/* <TouchableOpacity
               style={{
                 height: rh(3),
                 width: rh(3),
@@ -135,84 +137,40 @@ const SearchedProfile = ({ route }) => {
               activeOpacity={0.9}
             >
               <Text style={{ fontSize: rf(1.8) }}>+</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
-          <View style={{ gap: rh(2) }}>
-            <Text style={{ color: 'white', fontWeight: '800' }}>
+          <View style={styles.usernameAndCountContainer}>
+            <Text style={styles.usernameTextStyle}>
               {userData.name || 'User'}
             </Text>
-            <View style={{ flexDirection: 'row', gap: rw(10) }}>
+            <View style={styles.countContainer}>
               <View>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '800',
-                    fontSize: rf(1.7),
-                  }}
-                >
+                <Text style={styles.countContainerTextStyle}>
                   {userData?.postCount || 0}
                 </Text>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '800',
-                    fontSize: rf(1.7),
-                  }}
-                >
-                  Posts
-                </Text>
+                <Text style={styles.countContainerTextStyle}>Posts</Text>
               </View>
               <View>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '800',
-                    fontSize: rf(1.7),
-                  }}
-                >
+                <Text style={styles.countContainerTextStyle}>
                   {userData?.followersCount || 0}
                 </Text>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '800',
-                    fontSize: rf(1.7),
-                  }}
-                >
-                  followers
-                </Text>
+                <Text style={styles.countContainerTextStyle}>followers</Text>
               </View>
 
               <View>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '800',
-                    fontSize: rf(1.7),
-                  }}
-                >
+                <Text style={styles.countContainerTextStyle}>
                   {userData?.followingCount || 0}
                 </Text>
-                <Text
-                  style={{
-                    color: 'white',
-                    fontWeight: '800',
-                    fontSize: rf(1.7),
-                  }}
-                >
-                  following
-                </Text>
+                <Text style={styles.countContainerTextStyle}>following</Text>
               </View>
             </View>
           </View>
         </View>
       </View>
 
-      <View style={{ marginHorizontal: rw(5), marginTop: rh(3) }}>
-        <Text style={{ color: 'white', fontWeight: '700', fontSize: rf(1.7) }}>
-          {userData?.bio}
-        </Text>
+      <View style={styles.bioContainer}>
+        <Text style={styles.bioTextStyle}>{userData?.bio}</Text>
       </View>
       {/* <View style={{ marginHorizontal: 20, marginTop: 15 }}>
         <Text style={{ color: 'white', fontWeight: '700' }}>
@@ -241,7 +199,7 @@ const SearchedProfile = ({ route }) => {
         </Text>
       </TouchableOpacity> */}
 
-      {justFollowed ? (
+      {followed ? (
         <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
           <TouchableOpacity
             style={{
@@ -268,6 +226,14 @@ const SearchedProfile = ({ route }) => {
               padding: 10,
               paddingHorizontal: rw(10),
             }}
+            onPress={() =>
+              navigation.navigate('Chat', {
+                username: userData.username,
+                name: userData.name,
+                avatar: userData.avtar,
+                oppositeUserId: userData.id,
+              })
+            }
           >
             <Text
               style={{
@@ -356,45 +322,29 @@ const SearchedProfile = ({ route }) => {
           </TouchableOpacity>
         </View>
       )} */}
-      <View
-        style={{
-          flexDirection: 'row',
-          marginHorizontal: 20,
-          paddingVertical: 10,
-          gap: 10,
-        }}
-      >
-        <View
-          style={{
-            height: 60,
-            width: 60,
-            alignItems: 'center',
-            justifyContent: 'center',
-            backgroundColor: '#37474F',
-            borderRadius: 50,
-          }}
-        >
-          <FontAwesome5
-            name="lock"
-            size={20}
-            color={'white'}
-            iconStyle="solid"
-          ></FontAwesome5>
-        </View>
+      {userData && (
+        <View style={styles.accountPrivateContainer}>
+          <View style={styles.lockContainer}>
+            <FontAwesome5
+              name="lock"
+              size={20}
+              color={'white'}
+              iconStyle="solid"
+            ></FontAwesome5>
+          </View>
 
-        <View style={{ justifyContent: 'center' }}>
-          <Text style={{ color: 'white', fontWeight: '800' }}>
-            This account is private
-          </Text>
-          <Text style={{ color: 'white', fontWeight: '400', width: '80%' }}>
-            Follow this profile to see their photos and videos.
-          </Text>
+          <View style={styles.accountInnerContainer}>
+            <Text style={styles.accountText1Style}>
+              This account is private
+            </Text>
+            <Text style={styles.accountText2Style}>
+              Follow this profile to see their photos and videos.
+            </Text>
+          </View>
         </View>
-      </View>
+      )}
     </View>
   );
 };
 
 export default SearchedProfile;
-
-const styles = StyleSheet.create({});

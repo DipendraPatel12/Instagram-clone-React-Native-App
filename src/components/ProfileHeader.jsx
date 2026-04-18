@@ -1,15 +1,19 @@
-import { StyleSheet, Text, View, Image } from 'react-native';
+import { StyleSheet, Text, View, Image, TouchableOpacity } from 'react-native';
 import React from 'react';
 import { rf, rh } from '../helper/responsive';
+import { useNavigation } from '@react-navigation/native';
 
-const ProfileHeader = ({ name, username, avatar }) => {
+const ProfileHeader = ({ id, name, username, avatar }) => {
+  const navigation = useNavigation();
   return (
-    <View
+    <TouchableOpacity
       style={{
         alignItems: 'center',
         flexDirection: 'row',
         gap: 10,
       }}
+      activeOpacity={0.8}
+      onPress={() => navigation.navigate('SearchedProfile', { id, username })}
     >
       <View
         style={{
@@ -34,9 +38,9 @@ const ProfileHeader = ({ name, username, avatar }) => {
           {username}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
-};
+};    
 
 export default ProfileHeader;
 

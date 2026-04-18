@@ -13,6 +13,8 @@ import {
   getAuth,
 } from '@react-native-firebase/auth';
 
+import styles from './CreatePasswordStyle';
+
 const CreatePassword = ({ navigation, route }) => {
   const email = route?.params?.email;
   const username = route?.params?.username;
@@ -104,63 +106,3 @@ const CreatePassword = ({ navigation, route }) => {
 };
 
 export default CreatePassword;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#212121',
-    justifyContent: 'space-between',
-  },
-  innerConatiner: {
-    marginHorizontal: 25,
-    gap: 10,
-  },
-  heading: {
-    color: 'white',
-    fontWeight: '800',
-    fontSize: 24,
-  },
-  secondHeading: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '500',
-    marginBottom: 15,
-  },
-  textInputStyle: {
-    borderColor: 'grey',
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 20,
-    color: 'white',
-  },
-  notificationText: {
-    color: 'white',
-    fontWeight: '600',
-    fontSize: 13,
-  },
-  learnMoreText: {
-    color: '#90CAF9',
-    fontWeight: '600',
-  },
-  nextText: {
-    backgroundColor: '#1565C0',
-    padding: 15,
-    borderRadius: 25,
-  },
-  nextTextStyle: {
-    textAlign: 'center',
-    color: 'white',
-    fontWeight: '500',
-    fontSize: 15,
-  },
-  signupBtn: {
-    backgroundColor: '#37474F',
-    padding: 15,
-    borderRadius: 25,
-  },
-  alreadyAccountText: {
-    color: '#42A5F5',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
-});

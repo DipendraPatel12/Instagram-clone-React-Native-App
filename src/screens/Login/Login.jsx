@@ -1,20 +1,13 @@
-import {
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from 'react-native';
+import { Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import React, { useEffect, useState } from 'react';
 import {
   getAuth,
   signInWithEmailAndPassword,
 } from '@react-native-firebase/auth';
 import { StackActions } from '@react-navigation/native';
-import { rf, rh, rw } from '../../helper/responsive';
 import { useDispatch } from 'react-redux';
 import { getUserProfile } from '../../redux/slices/authSlice';
+import styles from './LoginStyle';
 const Login = ({ navigation }) => {
   const dipatch = useDispatch();
   const [email, setEmail] = useState('dipendrapatel926@gmail.com');
@@ -64,33 +57,13 @@ const Login = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <View style={{ gap: 25 }}>
-        <Text
-          style={{
-            color: 'white',
-            textAlign: 'center',
-            fontWeight: '400',
-            fontSize: rf(5),
-          }}
-        >
-          Instagram
-        </Text>
+        <Text style={styles.instagramHeader}>Instagram</Text>
 
         <View style={{ gap: 10 }}>
           <TextInput
             placeholderTextColor="grey"
             placeholder="email"
-            style={{
-              backgroundColor: '#212121',
-              borderWidth: 0.4,
-              borderColor: 'grey',
-              marginHorizontal: rw(5),
-              color: 'white',
-              borderRadius: 10,
-              paddingVertical: rh(2.5),
-              paddingHorizontal: rw(5),
-              elevation: 2,
-              fontSize: rf(1.8),
-            }}
+            style={styles.textInputStyle}
             value={email}
             onChangeText={text => setEmail(text)}
           ></TextInput>
@@ -98,135 +71,50 @@ const Login = ({ navigation }) => {
           <TextInput
             placeholderTextColor="grey"
             placeholder="password"
-            style={{
-              backgroundColor: '#212121',
-              borderWidth: 0.4,
-              borderColor: 'grey',
-              marginHorizontal: rw(5),
-              color: 'white',
-              borderRadius: 10,
-              paddingVertical: rh(2.5),
-              paddingHorizontal: rw(5),
-              fontSize: rf(1.8),
-              elevation: 10,
-            }}
+            style={styles.textInputStyle}
             value={password}
             onChangeText={text => setPassword(text)}
           ></TextInput>
 
-          <TouchableOpacity style={{ marginBottom: rh(4) }}>
-            <Text
-              style={{
-                color: '#90CAF9',
-                textAlign: 'right',
-                marginHorizontal: rw(5),
-                fontWeight: '500',
-                fontSize: rf(1.8),
-              }}
-            >
-              Forgot Password ?
-            </Text>
+          <TouchableOpacity style={styles.forgetPassContainer}>
+            <Text style={styles.forgetPassText}>Forgot Password ?</Text>
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={{ gap: 35 }}>
         <TouchableOpacity
-          style={{
-            backgroundColor: '#1565C0',
-            marginHorizontal: rw(5),
-            borderRadius: 20,
-          }}
+          style={styles.loginContainer}
           activeOpacity={0.8}
           onPress={() => handleLogin()}
         >
-          <Text
-            style={{
-              textAlign: 'center',
-              padding: 15,
-              color: 'white',
-              fontSize: rf(1.8),
-            }}
-          >
+          <Text style={styles.loginText}>
             {loading ? `Logging...` : 'log in'}
           </Text>
         </TouchableOpacity>
 
         {isError && (
           <View>
-            <Text
-              style={{ textAlign: 'center', color: 'red', fontSize: rf(1.5) }}
-            >
-              {error}
-            </Text>
+            <Text style={styles.errorText}>{error}</Text>
           </View>
         )}
         <View style={{ gap: 35 }}>
           <TouchableOpacity>
-            <Text
-              style={{
-                color: '#90CAF9',
-                textAlign: 'center',
-                marginHorizontal: rw(5),
-                fontWeight: '500',
-                fontSize: rf(1.8),
-              }}
-            >
-              Log in with Facebook
-            </Text>
+            <Text style={styles.loginFaceBookText}>Log in with Facebook</Text>
           </TouchableOpacity>
 
-          <View
-            style={{
-              flexDirection: 'row',
-              justifyContent: 'center',
-              alignItems: 'center',
-            }}
-          >
-            <View
-              style={{
-                borderBottomWidth: 0.5,
-                borderColor: 'white',
-                width: rw(35),
-                marginHorizontal: rw(5),
-              }}
-            ></View>
-            <Text
-              style={{
-                color: '#90A4AE',
-                textAlign: 'center',
-                fontSize: rf(1.9),
-              }}
-            >
-              OR
-            </Text>
-            <View
-              style={{
-                borderBottomWidth: 0.5,
-                borderColor: 'white',
-                width: rw(35),
-                marginHorizontal: rw(5),
-              }}
-            ></View>
+          <View style={styles.bottomLineAndOrContainer}>
+            <View style={styles.bottomLine}></View>
+            <Text style={styles.orText}>OR</Text>
+            <View style={styles.bottomLine}></View>
           </View>
 
-          <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-            <Text style={{ color: '#90A4AE', fontSize: rf(1.8) }}>
-              Don't have an account? {''}
-            </Text>
+          <View style={styles.accountAndSignupContainer}>
+            <Text style={styles.accountText}>Don't have an account? {''}</Text>
             <TouchableOpacity
               onPress={() => navigation.navigate('SetUsername')}
             >
-              <Text
-                style={{
-                  color: '#90CAF9',
-                  textAlign: 'center',
-                  fontWeight: '500',
-                  fontSize: rf(1.8),
-                }}
-              >
-                Sign up.
-              </Text>
+              <Text style={styles.signupText}>Sign up.</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -236,10 +124,3 @@ const Login = ({ navigation }) => {
 };
 
 export default Login;
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#212121',
-    justifyContent: 'center',
-  },
-});

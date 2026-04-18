@@ -31,7 +31,7 @@ export const getUserProfile = createAsyncThunk(
             const userFollowing = await firestore()
                 .collection('users')
                 .doc(id)
-                .collection('following')
+                .collection('followings')
                 .get();
 
             // console.log(userFollowing)
