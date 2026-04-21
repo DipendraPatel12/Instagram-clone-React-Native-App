@@ -15,7 +15,7 @@ import { rh, rw } from '../helper/responsive';
 
 const Tab = createBottomTabNavigator();
 const MainTabs = () => {
-  const { user } = useSelector(state => state.auth);
+  const { profile } = useSelector(state => state.profile);
   return (
     <Tab.Navigator
       screenOptions={{
@@ -59,7 +59,7 @@ const MainTabs = () => {
         component={Message}
         options={{
           headerTitleAlign: 'center',
-          headerTitle: user?.username || 'Unknown',
+          headerTitle: profile?.username || 'Unknown',
           headerTitleStyle: { fontSize: 20 },
           headerRight: () => <MessageContacts></MessageContacts>,
           tabBarIcon: () => (
@@ -93,13 +93,13 @@ const MainTabs = () => {
         component={Profile}
         options={{
           headerTitleAlign: 'center',
-          headerTitle: user?.username || 'Unknown',
+          headerTitle: profile?.username || 'Unknown',
           headerTitleStyle: { fontSize: 20 },
           headerLeft: () => <CreatePostBtn></CreatePostBtn>,
           headerRight: () => <MessageContacts></MessageContacts>,
           tabBarIcon: ({ focused }) => (
             <Image
-              source={{ uri: user?.avtar }}
+              source={{ uri: profile?.avtar }}
               style={{
                 height: rh(3.5),
                 width: rh(3.5),

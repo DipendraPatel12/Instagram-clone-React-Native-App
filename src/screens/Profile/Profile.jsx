@@ -9,18 +9,19 @@ import {
 import React, { useState } from 'react';
 import { getAuth, signOut } from '@react-native-firebase/auth';
 import { StackActions } from '@react-navigation/native';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import styles from './ProfileStyle';
+import { clearUser } from '../../redux/slices/authSlice';
 
 const Profile = ({ navigation }) => {
-  const { user } = useSelector(state => state.auth);
+  const dispatch = useDispatch();
+  const { profile } = useSelector(state => state.profile);
 
   const handleLogOut = async () => {
     try {
+      dispatch(clearUser());
       await signOut(getAuth());
-      // navigation.navigate('Login');
-      navigation.dispatch(StackActions.replace('Login'));
     } catch (error) {
       console.error(error);
     }
@@ -31,7 +32,7 @@ const Profile = ({ navigation }) => {
         <View style={styles.innerContainer}>
           <View style={styles.profileImageContainer}>
             <Image
-              source={{ uri: user?.avtar }}
+              source={{ uri: profile?.avtar }}
               style={styles.profileImageStyle}
               resizeMode="cover"
             ></Image>
@@ -46,25 +47,25 @@ const Profile = ({ navigation }) => {
 
           <View style={{ gap: 15 }}>
             <Text style={styles.usernameTextStyle}>
-              {user?.name || 'Unknown'}
+              {profile?.name || 'Unknown'}
             </Text>
             <View style={styles.countsContainer}>
               <View>
                 <Text style={styles.countTextStyle}>
-                  {user?.postCount || '0'}
+                  {profile?.postCount || '0'}
                 </Text>
                 <Text style={styles.countTextStyle}>Posts</Text>
               </View>
               <View>
                 <Text style={styles.countTextStyle}>
-                  {user?.followersCount || '0'}
+                  {profile?.followersCount || '0'}
                 </Text>
                 <Text style={styles.countTextStyle}>followers</Text>
               </View>
 
               <View>
                 <Text style={styles.countTextStyle}>
-                  {user?.followingCount || '0'}
+                  {profile?.followingCount || '0'}
                 </Text>
                 <Text style={styles.countTextStyle}>following</Text>
               </View>
@@ -74,7 +75,7 @@ const Profile = ({ navigation }) => {
       </View>
 
       <View style={styles.userBioContainer}>
-        <Text style={styles.userBioTextStyle}>{user?.bio}</Text>
+        <Text style={styles.userBioTextStyle}>{profile?.bio}</Text>
       </View>
 
       <View style={styles.editAndlogoutContainer}>

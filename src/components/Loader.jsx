@@ -1,15 +1,15 @@
-import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import React, { useEffect } from 'react';
+import { StyleSheet, View, ActivityIndicator } from 'react-native';
+import React from 'react';
 
-const Splash = () => {
+const Loader = () => {
   return (
     <View style={styles.container}>
-      <ActivityIndicator color="white" />
+      <ActivityIndicator></ActivityIndicator>
     </View>
   );
 };
 
-export default Splash;
+export default Loader;
 
 const styles = StyleSheet.create({
   container: {

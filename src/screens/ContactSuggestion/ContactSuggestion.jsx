@@ -10,34 +10,40 @@ import {
 import React, { useEffect, useState } from 'react';
 
 import firestore from '@react-native-firebase/firestore';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import styles from './ContactSuggestionStyle';
+import {
+  getContacts,
+  searchSuggestedContact,
+} from '../../redux/slices/chatSlice';
 const ContactSuggestion = ({ navigation }) => {
-  const { user } = useSelector(state => state.auth);
-  const [contacts, setContacts] = useState([]);
+  const dispatch = useDispatch();
+  const [searchText, setSearchText] = useState();
+  const { profile } = useSelector(state => state.profile);
+  const { suggestedContacts } = useSelector(state => state.chat);
   const messages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
   // console.warn('contact saved sucess', contacts);
   useEffect(() => {
-    getContact();
+    dispatch(getContacts(profile.id));
   }, []);
-  const getContact = async () => {
-    try {
-      const snapshot = await firestore()
-        .collection('users')
-        .where('id', '!=', user.id)
-        .get();
-      const users = snapshot.docs.map(doc => {
-        return {
-          ...doc.data(),
-        };
-      });
+  // const getContact = async () => {
+  //   try {
+  //     const snapshot = await firestore()
+  //       .collection('users')
+  //       .where('id', '!=', profile.id)
+  //       .get();
+  //     const users = snapshot.docs.map(doc => {
+  //       return {
+  //         ...doc.data(),
+  //       };
+  //     });
 
-      setContacts(users);
-      console.log('data from contact suggestions ', snapshot, users);
-    } catch (error) {
-      console.error('Error while Getting Contacts', error);
-    }
-  };
+  //     setContacts(users);
+  //     console.log('data from contact suggestions ', snapshot, users);
+  //   } catch (error) {
+  //     console.error('Error while Getting Contacts', error);
+  //   }
+  // };
 
   const createChat = async item => {
     try {
@@ -45,7 +51,7 @@ const ContactSuggestion = ({ navigation }) => {
 
       const existingChatSnapshot = await firestore()
         .collection('chats')
-        .where('participants', 'array-contains', user.id)
+        .where('participants', 'array-contains', profile.id)
         .get();
 
       const existingChat = existingChatSnapshot.docs.find(doc =>
@@ -65,7 +71,7 @@ const ContactSuggestion = ({ navigation }) => {
         const chatRef = firestore().collection('chats').doc();
 
         await chatRef.set({
-          participants: [user.id, oppositUserId],
+          participants: [profile.id, oppositUserId],
         });
 
         navigation.navigate('Chat', {
@@ -90,6 +96,8 @@ const ContactSuggestion = ({ navigation }) => {
           placeholder="Search"
           placeholderTextColor={'#B0BEC5'}
           style={styles.inputTextStyle}
+          value={searchText}
+          onChangeText={text => setSearchText(text)}
         ></TextInput>
       </View>
 
@@ -97,7 +105,7 @@ const ContactSuggestion = ({ navigation }) => {
         <Text style={styles.suggestedTextStyle}>Suggested</Text>
 
         <FlatList
-          data={contacts}
+          data={suggestedContacts}
           showsVerticalScrollIndicator={false}
           renderItem={({ item }) => (
             <TouchableHighlight onPress={() => createChat(item)}>

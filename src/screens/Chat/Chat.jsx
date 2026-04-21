@@ -16,12 +16,13 @@ import { rf, rh, rw } from '../../helper/responsive';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import styles from './ChatStyle';
 import { FlashList } from '@shopify/flash-list';
+
 const Chat = ({ route }) => {
   const flatListRef = useRef();
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState([]);
   const [visible, setVisible] = useState(false);
-  const { user } = useSelector(state => state.auth);
+  const { profile } = useSelector(state => state.profile);
   const avatar = route?.params?.avatar;
   const oppositeUserId = route?.params?.oppositeUserId;
 
@@ -54,7 +55,7 @@ const Chat = ({ route }) => {
     try {
       const existingChatSnapshot = await firestore()
         .collection('chats')
-        .where('participants', 'array-contains', user.id)
+        .where('participants', 'array-contains', profile.id)
         .get();
 
       const existingDoc = existingChatSnapshot.docs.find(doc =>
@@ -96,8 +97,8 @@ const Chat = ({ route }) => {
           .doc(activeChatId)
           .collection('messages')
           .add({
-            senderId: user.id,
-            senderName: user.name,
+            senderId: profile.id,
+            senderName: profile.name,
             content: messageText,
             sendingTime: firestore.FieldValue.serverTimestamp(),
           });
@@ -122,6 +123,7 @@ const Chat = ({ route }) => {
       console.error('Error while deleting message:', error);
     }
   };
+
   return (
     <View style={styles.container} onPress={() => setVisible(false)}>
       <FlashList
@@ -134,7 +136,8 @@ const Chat = ({ route }) => {
             <View
               style={{
                 flexDirection: 'row',
-                alignSelf: item.senderId == user.id ? 'flex-end' : 'flex-start',
+                alignSelf:
+                  item.senderId == profile.id ? 'flex-end' : 'flex-start',
                 gap: rw(2),
               }}
             >
@@ -155,11 +158,12 @@ const Chat = ({ route }) => {
                 <Text
                   style={{
                     backgroundColor:
-                      item?.senderId == user.id ? '#6A1B9A' : '#424242',
+                      item?.senderId == profile.id ? '#6A1B9A' : '#424242',
                     ...styles.messageTextStyle,
                   }}
                 >
                   {item?.content}
+                  {item?.replyTo}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -231,3 +235,5 @@ const Chat = ({ route }) => {
 };
 
 export default Chat;
+
+//@#7899@#

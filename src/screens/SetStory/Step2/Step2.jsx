@@ -7,7 +7,7 @@ import { uploadToCloudinary } from '../../../services/cloudinary';
 import firestore from '@react-native-firebase/firestore';
 const Step2 = ({ route, navigation }) => {
   const { url, type } = route?.params || '';
-  const { user } = useSelector(state => state.auth);
+  const { profile } = useSelector(state => state.profile);
 
   const postStory = async () => {
     // console.log('called');
@@ -15,12 +15,12 @@ const Step2 = ({ route, navigation }) => {
     const storyUrl = await uploadToCloudinary(url, type);
     await firestore()
       .collection('stories')
-      .doc(user.id)
+      .doc(profile.id)
       .collection('list')
       .add({
-        user_id: user.id,
-        username: user.username,
-        avatar: user.avtar || '',
+        user_id: profile.id,
+        username: profile.username,
+        avatar: profile.avtar || '',
         story_url: storyUrl,
         createdAt: firestore.FieldValue.serverTimestamp(),
         expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),

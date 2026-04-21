@@ -19,7 +19,7 @@ const StoriesSlider = ({ stories }) => {
   console.warn('stories', stories);
   const navigation = useNavigation();
 
-  const { user } = useSelector(state => state.auth);
+  const { profile } = useSelector(state => state.profile);
   return (
     <>
       <FlashList
@@ -50,7 +50,7 @@ const StoriesSlider = ({ stories }) => {
             >
               <Image
                 source={{
-                  uri: item.isMyStory ? user.avtar : item?.avatar,
+                  uri: item.isMyStory ? profile?.avtar : item?.avatar,
                 }}
                 style={styles.imageStyle}
               ></Image>
@@ -65,7 +65,7 @@ const StoriesSlider = ({ stories }) => {
               </TouchableOpacity>
             )}
             <Text style={styles.usernameText}>
-              {item.user_id === user.id ? 'Your story' : item.username}
+              {item.user_id === profile?.id ? 'Your story' : item?.username}
             </Text>
           </View>
         )}

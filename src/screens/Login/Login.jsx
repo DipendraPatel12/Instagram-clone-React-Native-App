@@ -19,7 +19,6 @@ const Login = ({ navigation }) => {
 
   useEffect(() => {
     setTimeout(() => {
-      setIsError();
       setError('');
     }, 3000);
   }, [isError]);
@@ -29,29 +28,25 @@ const Login = ({ navigation }) => {
       Alert.alert('All field required!');
       return;
     }
+
     setIsError(false);
     setLoading(true);
+
     try {
-      const user = await signInWithEmailAndPassword(getAuth(), email, password);
-      console.log(user.user);
-      setLoading(false);
-      if (user.user._user.emailVerified) {
-        // navigation.navigate('MainTabs');
-        dipatch(getUserProfile(user.user._user.uid));
-        navigation.dispatch(StackActions.replace('MainTabs'));
-      } else {
+      const res = await signInWithEmailAndPassword(getAuth(), email, password);
+
+      if (!res.user.emailVerified) {
         Alert.alert('Verify Email First!');
+        return;
       }
-      // console.warn('data', data);
+      setLoading(false);
+      setEmail('');
+      setPassword('');
     } catch (error) {
       console.warn(error);
       setError('Invalid Credentials!');
       setIsError(true);
-      setLoading(false);
     }
-
-    setEmail('');
-    setPassword('');
   };
 
   return (

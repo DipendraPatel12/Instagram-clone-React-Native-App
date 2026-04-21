@@ -34,3 +34,5 @@ export const uploadToCloudinary = async (fileUri, type = 'image/jpeg') => {
     return null;
   }
 };
+
+

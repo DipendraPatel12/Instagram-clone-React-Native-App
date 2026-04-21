@@ -22,9 +22,9 @@ const CreatePostStep2 = ({ route, navigation }) => {
   const [text, setText] = useState(false);
   const { img, type } = route?.params;
 
-  const { user } = useSelector(state => state.auth);
+  const { profile } = useSelector(state => state.profile);
 
-  // console.log('user from redux ', user);
+  // console.log('profile from redux ', profile);
 
   const [uploading, setUploading] = useState(false);
   console.warn(img, type);
@@ -39,8 +39,9 @@ const CreatePostStep2 = ({ route, navigation }) => {
       await firestore()
         .collection('posts')
         .add({
-          user_id: user.id,
-          username: user?.username || 'Unknown',
+          user_id: profile.id,
+          username: profile?.username || 'Unknown',
+          userAvatar: profile?.avtar,
           post_media_url: url,
           content: content,
         });

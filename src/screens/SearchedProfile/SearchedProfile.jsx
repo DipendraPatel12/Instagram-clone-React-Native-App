@@ -1,114 +1,51 @@
-import {
-  Text,
-  View,
-  Image,
-  TouchableOpacity,
-  ActivityIndicator,
-} from 'react-native';
-import React, { useEffect, useState } from 'react';
+import { Text, View, Image, TouchableOpacity } from 'react-native';
+import React, { useEffect } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import firestore from '@react-native-firebase/firestore';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { rf, rh, rw } from '../../helper/responsive';
 import styles from './SearchedProfileStyle';
+import {
+  getSearchedProfile,
+  toggleFollow,
+} from '../../redux/slices/profileSlice';
+import Loader from '../../components/Loader';
 const SearchedProfile = ({ route, navigation }) => {
+  const dispatch = useDispatch();
   const id = route?.params?.id;
-  const [loading, setLoading] = useState(true);
-  const [userData, setUserData] = useState({});
-
-  const [followed, setFollowed] = useState(false);
-
-  const [userFollowerDocs, setUserFollowerDocs] = useState([]);
-  console.log('userFollowerDocs', userFollowerDocs);
-
-  const { user } = useSelector(state => state.auth);
-  // console.log('userData', userData);
+  const { profile, searchedProfile, loading } = useSelector(
+    state => state.profile,
+  );
+  console.log('SEARC', searchedProfile);
   useEffect(() => {
-    const getUserProfile = async () => {
-      try {
-        const userDetails = await firestore().collection('users').doc(id).get();
-
-        const userFollow = await firestore()
-          .collection('users')
-          .doc(id)
-          .collection('followers')
-          .get();
-
-        setUserFollowerDocs(userFollow);
-
-        userFollow.docs.forEach(doc => {
-          if (doc === user?.id);
-          {
-            setFollowed(true);
-            return;
-          }
-        });
-
-        const userFollowing = await firestore()
-          .collection('users')
-          .doc(id)
-          .collection('followings')
-          .get();
-
-        const usersPosts = await firestore()
-          .collection('posts')
-          .where('user_id', '==', id)
-          .get();
-        const user = userDetails.data();
-        // console.log('user data', user, userFollow.size, userFollowing.size);
-        setLoading(false);
-
-        setUserData({
-          ...user,
-          postCount: usersPosts.size,
-          followersCount: userFollow.size,
-          followingCount: userFollowing.size,
-        });
-
-        console.log('searched Pro ', userFollow, userFollowing);
-      } catch (error) {
-        console.error('Error While Getting User Data', error);
-      }
-    };
-
-    getUserProfile();
+    dispatch(getSearchedProfile({ id, userId: profile?.id }));
   }, [route.params.id]);
 
   const followUser = async () => {
-    try {
-      await firestore()
-        .collection('users')
-        .doc(id)
-        .collection('followers')
-        .doc(user.id)
-        .set({});
+    // try {
+    //   await firestore()
+    //     .collection('users')
+    //     .doc(id)
+    //     .collection('followers')
+    //     .doc(profile.id)
+    //     .set({});
 
-      await firestore()
-        .collection('users')
-        .doc(user.id)
-        .collection('followings')
-        .doc(id)
-        .set({});
+    //   await firestore()
+    //     .collection('users')
+    //     .doc(profile.id)
+    //     .collection('followings')
+    //     .doc(id)
+    //     .set({});
 
-      console.log('followed');
-    } catch (error) {
-      console.error('Error while Following user', error);
-    }
+    //   console.log('followed');
+    // } catch (error) {
+    //   console.error('Error while Following user', error);
+    // }
+    dispatch(toggleFollow({ id, userId: profile?.id }));
   };
 
   if (loading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: 'black',
-        }}
-      >
-        <ActivityIndicator></ActivityIndicator>
-      </View>
-    );
+    return <Loader></Loader>;
   }
   return (
     <View style={styles.container}>
@@ -116,7 +53,7 @@ const SearchedProfile = ({ route, navigation }) => {
         <View style={styles.profileCountInnerContainer}>
           <View style={styles.profileImageContainer}>
             <Image
-              source={{ uri: userData?.avtar }}
+              source={{ uri: searchedProfile?.avtar }}
               style={styles.profileImageStyle}
               resizeMode="cover"
             ></Image>
@@ -142,25 +79,25 @@ const SearchedProfile = ({ route, navigation }) => {
 
           <View style={styles.usernameAndCountContainer}>
             <Text style={styles.usernameTextStyle}>
-              {userData.name || 'User'}
+              {searchedProfile.name || 'User'}
             </Text>
             <View style={styles.countContainer}>
               <View>
                 <Text style={styles.countContainerTextStyle}>
-                  {userData?.postCount || 0}
+                  {searchedProfile?.postCount || 0}
                 </Text>
                 <Text style={styles.countContainerTextStyle}>Posts</Text>
               </View>
               <View>
                 <Text style={styles.countContainerTextStyle}>
-                  {userData?.followersCount || 0}
+                  {searchedProfile?.followersCount || 0}
                 </Text>
                 <Text style={styles.countContainerTextStyle}>followers</Text>
               </View>
 
               <View>
                 <Text style={styles.countContainerTextStyle}>
-                  {userData?.followingCount || 0}
+                  {searchedProfile?.followingCount || 0}
                 </Text>
                 <Text style={styles.countContainerTextStyle}>following</Text>
               </View>
@@ -170,7 +107,7 @@ const SearchedProfile = ({ route, navigation }) => {
       </View>
 
       <View style={styles.bioContainer}>
-        <Text style={styles.bioTextStyle}>{userData?.bio}</Text>
+        <Text style={styles.bioTextStyle}>{searchedProfile?.bio}</Text>
       </View>
       {/* <View style={{ marginHorizontal: 20, marginTop: 15 }}>
         <Text style={{ color: 'white', fontWeight: '700' }}>
@@ -199,7 +136,7 @@ const SearchedProfile = ({ route, navigation }) => {
         </Text>
       </TouchableOpacity> */}
 
-      {followed ? (
+      {searchedProfile?.isFollowed ? (
         <View style={{ flexDirection: 'row', justifyContent: 'space-around' }}>
           <TouchableOpacity
             style={{
@@ -210,6 +147,7 @@ const SearchedProfile = ({ route, navigation }) => {
               padding: 10,
               paddingHorizontal: rw(10),
             }}
+            onPress={followUser}
           >
             <Text
               style={{ color: 'white', textAlign: 'center', fontSize: rf(1.7) }}
@@ -228,10 +166,10 @@ const SearchedProfile = ({ route, navigation }) => {
             }}
             onPress={() =>
               navigation.navigate('Chat', {
-                username: userData.username,
-                name: userData.name,
-                avatar: userData.avtar,
-                oppositeUserId: userData.id,
+                username: searchedProfile?.username,
+                name: searchedProfile?.name,
+                avatar: searchedProfile?.avtar,
+                oppositeUserId: searchedProfile?.id,
               })
             }
           >
@@ -322,7 +260,7 @@ const SearchedProfile = ({ route, navigation }) => {
           </TouchableOpacity>
         </View>
       )} */}
-      {userData && (
+      {!searchedProfile?.isFollowed && (
         <View style={styles.accountPrivateContainer}>
           <View style={styles.lockContainer}>
             <FontAwesome5

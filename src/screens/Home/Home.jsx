@@ -12,41 +12,42 @@ import StoriesSlider from '../../components/StoriesSlider';
 import EmptyData from '../../components/EmptyData';
 import firestore from '@react-native-firebase/firestore';
 import { useDispatch, useSelector } from 'react-redux';
-import { getUserProfile } from '../../redux/slices/authSlice';
+import { getUserProfile } from '../../redux/slices/profileSlice';
 import { getAuth } from '@react-native-firebase/auth';
 import styles from './HomeStyle';
+import Video from 'react-native-video';
+import {
+  getPosts,
+  getSinglePost,
+  postLike,
+} from '../../redux/slices/postSlice';
+import { rh, rw } from '../../helper/responsive';
 
 const Home = ({ navigation }) => {
   const dispatch = useDispatch();
   const [refreshing, setRefreshing] = useState(false);
-  // const des = `@dipendra  Lorem, ipsum dolor sit amet consectetur adipisicing elit. Amet odit error saepe sequi tempore delenitis ed illo architecto natus perspiciatis! Officia ab adipisci quibusdam officiis beatae illum facere quaerat corporis `;
+  // const des = `@dipendra  Lorem, ipsum dolor sit amet consectetur adipisicing elit.delenitis ed illo architecto natus perspiciatis! Officia ab adipisci quibusdam officiis beatae illum facere quaerat corporis `;
   // const des = 'sdf sfdsf sfsfsdf ';
   const [showMore, setShowMore] = useState(false);
   const [selectedShowMoreIndex, setSelectedShowMoreIndex] = useState();
-  const [allPost, setAllPost] = useState([]);
   const [allStories, setAllStories] = useState([]);
   const loggedInUser = getAuth().currentUser._user;
+  const { profile } = useSelector(state => state.profile);
   const { user } = useSelector(state => state.auth);
-  // console.log('user in home ', loggedInUser);
+  const { posts, loading } = useSelector(state => state.posts);
+
+  console.warn('user data ---------------------------->', user);
+  console.warn('posts from store', posts);
+  // console.log('profile in home ', loggedInUser);
   // console.log('storeis', allStories);
   const Post = [1, 2, 3, 4, 5, 6, 7, 8, 9];
-  // console.log(allPost);
+
   useEffect(() => {
-    getPosts();
-    getStories();
     dispatch(getUserProfile(loggedInUser.uid));
+    dispatch(getPosts(loggedInUser.uid));
+    // getStories();
   }, []);
 
-  const getPosts = async () => {
-    const snapshot = await firestore().collection('posts').get();
-
-    const postsData = snapshot.docs.map(doc => ({
-      id: doc.id,
-      ...doc.data(),
-    }));
-
-    setAllPost(postsData);
-  };
   // const getStories = async () => {
   //   const now = new Date();
 
@@ -62,13 +63,13 @@ const Home = ({ navigation }) => {
   //   // const formattedStories = [
   //   //   {
   //   //     isMyStory: true,
-  //   //     avatar: user?.avtar,
-  //   //     user_id: user?.id,
+  //   //     avatar: profile?.avtar,
+  //   //     user_id: profile?.id,
   //   //   },
   //   //   ...storiesData,
   //   // ];
-  //   const myStory = storiesData.find(st => st.user_id == user.id);
-  //   const otherStories = storiesData.filter(st => st.user_id != user.id);
+  //   const myStory = storiesData.find(st => st.user_id == profile.id);
+  //   const otherStories = storiesData.filter(st => st.user_id != profile.id);
   //   const formattedStories = [
   //     {
   //       isMyStory: true,
@@ -80,75 +81,81 @@ const Home = ({ navigation }) => {
   //   setAllStories(formattedStories);
   // };
 
-  const getStories = async () => {
-    const docs = await firestore().collection('stories').get();
-    const now = new Date();
+  // const getStories = async () => {
+  //   const docs = await firestore().collection('stories').get();
+  //   const now = new Date();
 
-    const storyPromises = docs.docs.map(async doc => {
-      const snapshot = await firestore()
-        .collection('stories')
-        .doc(doc.id)
-        .collection('list')
-        .get();
+  //   const storyPromises = docs.docs.map(async doc => {
+  //     const snapshot = await firestore()
+  //       .collection('stories')
+  //       .doc(doc.id)
+  //       .collection('list')
+  //       .get();
 
-      return snapshot.docs.map(doc => {
-        if (doc?.expiresAt > now) {
-          return { id: doc.id, ...doc.data() };
-        }
-      });
-    });
+  //     return snapshot.docs.map(doc => {
+  //       if (doc?.expiresAt > now) {
+  //         return { id: doc.id, ...doc.data() };
+  //       }
+  //     });
+  //   });
 
-    const results = await Promise.all(storyPromises);
-    const store = results.flat();
+  //   const results = await Promise.all(storyPromises);
+  //   const store = results.flat();
 
-    console.log('Stories from Home ', store);
+  //   console.log('Stories from Home ', store);
 
-    const myStory = store.find(st => st.user_id == user.id);
-    const otherStories = store.filter(st => st.user_id != user.id);
+  //   const myStory = store.find(st => st.user_id == profile.id);
+  //   const otherStories = store.filter(st => st.user_id != profile.id);
 
-    const formattedStories = [
-      {
-        isMyStory: true,
-        ...myStory,
-      },
-      ...otherStories,
-    ];
+  //   const formattedStories = [
+  //     {
+  //       isMyStory: true,
+  //       ...myStory,
+  //     },
+  //     ...otherStories,
+  //   ];
 
-    setAllStories(formattedStories);
-  };
+  //   setAllStories(formattedStories);
+  // };
 
-  const poslike = async id => {
-    try {
-      const likeRef = firestore()
-        .collection('posts')
-        .doc(id)
-        .collection('likes')
-        .doc(user.id);
+  // const poslike = async id => {
+  //   dispatch(getSinglePost(id));
+  //   try {
+  //     const likeRef = firestore()
+  //       .collection('posts')
+  //       .doc(id)
+  //       .collection('likes')
+  //       .doc(profile.id);
 
-      const data = await likeRef.get();
+  //     const data = await likeRef.get();
 
-      if (data.exists()) {
-        await likeRef.delete();
-      } else {
-        await likeRef.set({});
-      }
-      console.log('post liked or unliked', data);
-    } catch (error) {
-      console.error('Error while Post like', error);
-    }
-  };
+  //     if (data.exists()) {
+  //       await likeRef.delete();
+  //     } else {
+  //       await likeRef.set({});
+  //     }
+  //     console.log('post liked or unliked', data);
+  //   } catch (error) {
+  //     console.error('Error while Post like', error);
+  //   }
+  // };
   const onRefresh = async () => {
     setRefreshing(true);
     setTimeout(() => {
-      getPosts();
+      dispatch(getPosts(profile.id));
       setRefreshing(false);
-    }, 2000);
+    }, 500);
+  };
+
+  const toggleLike = id => {
+    console.warn('called');
+    dispatch(postLike({ id, userId: profile.id }));
   };
 
   return (
     <View style={styles.container}>
       <FlatList
-        data={allPost}
+        data={posts}
         refreshControl={
           <RefreshControl
             refreshing={refreshing}
@@ -165,7 +172,7 @@ const Home = ({ navigation }) => {
                 style={styles.profileAndNameContainer}
                 activeOpacity={0.8}
                 onPress={() => {
-                  if (item?.user_id === user.id) {
+                  if (item?.user_id === profile.id) {
                     navigation.navigate('MainTabs', { screen: 'Profile' });
                   } else {
                     navigation.navigate('SearchedProfile', {
@@ -200,24 +207,44 @@ const Home = ({ navigation }) => {
 
             {/* image */}
             <View style={styles.postImageContainer}>
-              <Image
-                source={{ uri: item?.post_media_url }}
-                style={styles.postImageStyle}
-                resizeMode="cover"
-              ></Image>
+              {item?.post_media_url?.includes('video') ? (
+                <Video
+                  source={{
+                    uri: item?.post_media_url,
+                  }}
+                  style={{ height: rh(50), width: rw(100) }}
+                  paused={false} 
+                  repeat={true} 
+                  muted={true}
+                />
+              ) : (
+                <Image
+                  source={{ uri: item?.post_media_url }}
+                  style={styles.postImageStyle}
+                  resizeMode="cover"
+                ></Image>
+              )}
             </View>
 
             <View style={styles.postActionContainer}>
               <View style={styles.postActionLeftContainer}>
                 <TouchableOpacity
                   style={styles.actionIconContainer}
-                  onPress={() => poslike(item.id)}
+                  onPress={() => toggleLike(item.id)}
                 >
-                  <FontAwesome5 name="heart" size={25} color="white" />
-                  <Text style={styles.actionTextStyle}>{25}</Text>
+                  <FontAwesome5
+                    name="heart"
+                    size={25}
+                    color={item?.isLiked ? 'red' : 'white'}
+                    iconStyle={item.isLiked ? 'solid' : null}
+                  />
+                  <Text style={styles.actionTextStyle}>
+                    {item?.likesCount == 0 ? '' : item?.likesCount}
+                    {item?.isLiked}
+                  </Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.actionIconContainer}>
+                {/* <TouchableOpacity style={styles.actionIconContainer}>
                   <FontAwesome5 name="comment" size={25} color="white" />
                   <Text style={styles.actionTextStyle}>{25}</Text>
                 </TouchableOpacity>
@@ -229,7 +256,7 @@ const Home = ({ navigation }) => {
                 <TouchableOpacity style={styles.actionIconContainer}>
                   <FontAwesome5 name="heart" size={25} color="white" />
                   <Text style={styles.actionTextStyle}>{25}</Text>
-                </TouchableOpacity>
+                </TouchableOpacity> */}
               </View>
 
               <View>
@@ -263,9 +290,9 @@ const Home = ({ navigation }) => {
             </View>
           </View>
         )}
-        ListHeaderComponent={
-          <StoriesSlider stories={allStories}></StoriesSlider>
-        }
+        // ListHeaderComponent={
+        //   <StoriesSlider stories={allStories}></StoriesSlider>
+        // }
         ListEmptyComponent={<EmptyData title={'Post'}></EmptyData>}
         contentContainerStyle={{
           flexGrow: 1,

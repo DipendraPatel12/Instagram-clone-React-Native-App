@@ -1,93 +1,91 @@
-import {
-  FlatList,
-  Image,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableHighlight,
-  View,
-} from 'react-native';
-import React, { use, useEffect, useState } from 'react';
+import { Image, Text, TextInput, TouchableHighlight, View } from 'react-native';
+import React, { useEffect, useState, useCallback } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5/static';
-import { rf, rh, rw } from '../../helper/responsive';
-import firestore from '@react-native-firebase/firestore';
-import { useSelector } from 'react-redux';
+import firestore, { disableNetwork } from '@react-native-firebase/firestore';
+import { useDispatch, useSelector } from 'react-redux';
 import { useFocusEffect } from '@react-navigation/native';
 import styles from './MessageStyle';
 import { FlashList } from '@shopify/flash-list';
+import {
+  getRecentChats,
+  searchRecentChatWith,
+} from '../../redux/slices/chatSlice';
+
 const Message = ({ navigation }) => {
+  const dispatch = useDispatch();
   const [searchText, setSearchText] = useState('');
   const [chats, setChats] = useState([]);
-  const { user } = useSelector(state => state.auth);
-  const [chatsHistory, setChatsHistory] = useState([]);
-
+  const { profile } = useSelector(state => state.profile);
+  const { recentChats } = useSelector(state => state.chat);
+  console.log('REddddddddddddddddddddddddd=0', recentChats);
   const handleSearch = () => {
     if (searchText === '') {
       return;
     }
     const data = chats.filter(chat =>
-      chat?.otherUser?.name.toLowerCase().startsWith(searchText.toLowerCase()),
+      recentChats?.otherUser?.name
+        .toLowerCase()
+        .startsWith(searchText.toLowerCase()),
     );
     setChats(data);
   };
 
   useEffect(() => {
-    handleSearch();
+    // handleSearch();
+    dispatch(searchRecentChatWith(searchText));
   }, [searchText]);
 
   useEffect(() => {
-    getRecentChats();
+    dispatch(getRecentChats(profile.id));
   }, []);
 
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       setSearchText('');
-      // setChats(chatsHistory);
       console.log('Screen is focused');
     }, []),
   );
-  const getRecentChats = async () => {
-    try {
-      const snapshot = await firestore()
-        .collection('chats')
-        .where('participants', 'array-contains', user.id)
-        .get();
+  // const getRecentChats = async () => {
+  //   try {
+  //     const snapshot = await firestore()
+  //       .collection('chats')
+  //       .where('participants', 'array-contains', profile.id)
+  //       .get();
 
-      const chatsData = await Promise.all(
-        snapshot.docs.map(async doc => {
-          const chat = { id: doc.id, ...doc.data() };
+  //     const chatsData = await Promise.all(
+  //       snapshot.docs.map(async doc => {
+  //         const chat = { id: doc.id, ...doc.data() };
 
-          const otherUserId = chat.participants.find(id => id !== user.id);
+  //         const otherUserId = chat.participants.find(id => id !== profile.id);
 
-          const userDoc = await firestore()
-            .collection('users')
-            .doc(otherUserId)
-            .get();
+  //         const userDoc = await firestore()
+  //           .collection('users')
+  //           .doc(otherUserId)
+  //           .get();
 
-          const otherUser = userDoc.data();
+  //         const otherUser = userDoc.data();
 
-          return {
-            ...chat,
-            otherUserId,
-            otherUser,
-          };
-        }),
-      );
+  //         return {
+  //           ...chat,
+  //           otherUserId,
+  //           otherUser,
+  //         };
+  //       }),
+  //     );
 
-      setChats(chatsData);
-      setChatsHistory(chatsData);
-      console.log(chatsData);
-    } catch (error) {
-      console.error('Error fetching chats:', error);
-    }
-  };
+  //     setChats(chatsData);
+  //     console.log(chatsData);
+  //   } catch (error) {
+  //     console.error('Error fetching chats:', error);
+  //   }
+  // };
 
   // const messages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
   return (
     <View style={styles.container}>
       <FlashList
-        data={chats}
+        data={recentChats}
         showsVerticalScrollIndicator={false}
         renderItem={({ item }) => (
           <TouchableHighlight

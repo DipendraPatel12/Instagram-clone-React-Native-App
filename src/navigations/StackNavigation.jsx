@@ -1,5 +1,5 @@
 import { StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from '../screens/Login/Login';
 import SignUpWithPhone from '../screens/SignUpWithPhone/SignUpWithPhone';
@@ -23,213 +23,239 @@ import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import MainTabs from '../navigations/MainTabs';
 import EditProfile from '../screens/Profile/EditProfile/EditProfile';
 import Step2 from '../screens/SetStory/Step2/Step2';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
+import { clearUser, setUser } from '../redux/slices/authSlice';
 const Stack = createNativeStackNavigator();
 
 const StackNavigation = ({ navigation }) => {
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(getAuth(), user => {
+      if (user) {
+        dispatch(
+          setUser({
+            uid: user.uid,
+            email: user.email,
+          }),
+        );
+      } else {
+        dispatch(clearUser());
+      }
+    });
+
+    return unsubscribe;
+  }, []);
+  const { user, loading } = useSelector(state => state.auth);
+
+  if (loading) {
+    return <Splash />;
+  }
   return (
     <>
       <Stack.Navigator>
-        {/* ṣplash screen */}
-        <Stack.Screen
-          name="Splash"
-          component={Splash}
-          options={{ headerShown: false }}
-        ></Stack.Screen>
+        {!user && (
+          <>
+            {/* login */}
+            <Stack.Screen
+              name="Login"
+              component={Login}
+              options={{ headerShown: false }}
+            ></Stack.Screen>
 
-        {/* maintabs */}
-        <Stack.Screen
-          name="MainTabs"
-          component={MainTabs}
-          options={{
-            headerShown: false,
-            headerLeft: () => <CreatePostBtn></CreatePostBtn>,
-            headerRight: () => <Notification></Notification>,
-            headerTitleAlign: 'center',
-            headerTitle: '𝑰𝒏𝒔𝒕𝒂𝒈𝒓𝒂𝒎',
-            headerTitleStyle: { fontSize: 25 },
-            headerTintColor: 'white',
-            headerStyle: { backgroundColor: 'black' },
-          }}
-        ></Stack.Screen>
+            {/* setUser name */}
+            <Stack.Screen
+              name="SetUsername"
+              component={SetUsername}
+              options={{
+                headerTintColor: 'white',
+                headerTitle: '',
+                headerStyle: { backgroundColor: '#212121' },
+                headerShadowVisible: false,
+              }}
+            ></Stack.Screen>
 
-        {/* login */}
-        <Stack.Screen
-          name="Login"
-          component={Login}
-          options={{ headerShown: false }}
-        ></Stack.Screen>
+            {/* signup with phone */}
+            <Stack.Screen
+              name="SignUpWithPhone"
+              component={SignUpWithPhone}
+              options={{
+                headerTintColor: 'white',
+                headerTitle: '',
+                headerStyle: { backgroundColor: '#212121' },
+                headerShadowVisible: false,
+              }}
+            ></Stack.Screen>
 
-        {/* setUser name */}
-        <Stack.Screen
-          name="SetUsername"
-          component={SetUsername}
-          options={{
-            headerTintColor: 'white',
-            headerTitle: '',
-            headerStyle: { backgroundColor: '#212121' },
-            headerShadowVisible: false,
-          }}
-        ></Stack.Screen>
+            {/* signup with email */}
+            <Stack.Screen
+              name="SignUpWithEmail"
+              component={SignUpWithEmail}
+              options={{
+                headerTintColor: 'white',
+                headerTitle: '',
+                headerStyle: { backgroundColor: '#212121' },
+                headerShadowVisible: false,
+              }}
+            ></Stack.Screen>
 
-        {/* signup with phone */}
-        <Stack.Screen
-          name="SignUpWithPhone"
-          component={SignUpWithPhone}
-          options={{
-            headerTintColor: 'white',
-            headerTitle: '',
-            headerStyle: { backgroundColor: '#212121' },
-            headerShadowVisible: false,
-          }}
-        ></Stack.Screen>
+            {/* createpassword */}
+            <Stack.Screen
+              name="CreatePassword"
+              component={CreatePassword}
+              options={{
+                headerTintColor: 'white',
+                headerTitle: '',
+                headerStyle: { backgroundColor: '#212121' },
+                headerShadowVisible: false,
+              }}
+            ></Stack.Screen>
+          </>
+        )}
+        {user && (
+          <>
+            {/* maintabs */}
+            <Stack.Screen
+              name="MainTabs"
+              component={MainTabs}
+              options={{
+                headerShown: false,
+                headerLeft: () => <CreatePostBtn></CreatePostBtn>,
+                headerRight: () => <Notification></Notification>,
+                headerTitleAlign: 'center',
+                headerTitle: '𝑰𝒏𝒔𝒕𝒂𝒈𝒓𝒂𝒎',
+                headerTitleStyle: { fontSize: 25 },
+                headerTintColor: 'white',
+                headerStyle: { backgroundColor: 'black' },
+              }}
+            ></Stack.Screen>
 
-        {/* signup with email */}
-        <Stack.Screen
-          name="SignUpWithEmail"
-          component={SignUpWithEmail}
-          options={{
-            headerTintColor: 'white',
-            headerTitle: '',
-            headerStyle: { backgroundColor: '#212121' },
-            headerShadowVisible: false,
-          }}
-        ></Stack.Screen>
+            {/* contact suggestion */}
 
-        {/* createpassword */}
-        <Stack.Screen
-          name="CreatePassword"
-          component={CreatePassword}
-          options={{
-            headerTintColor: 'white',
-            headerTitle: '',
-            headerStyle: { backgroundColor: '#212121' },
-            headerShadowVisible: false,
-          }}
-        ></Stack.Screen>
+            <Stack.Screen
+              name="ContactSuggestion"
+              component={ContactSuggestion}
+              options={{
+                headerStyle: { backgroundColor: 'black' },
+                headerTintColor: 'white',
+                headerTitle: 'New messages',
+              }}
+            ></Stack.Screen>
 
-        {/* contact suggestion */}
+            {/* chat screen */}
 
-        <Stack.Screen
-          name="ContactSuggestion"
-          component={ContactSuggestion}
-          options={{
-            headerStyle: { backgroundColor: 'black' },
-            headerTintColor: 'white',
-            headerTitle: 'New messages',
-          }}
-        ></Stack.Screen>
+            <Stack.Screen
+              name="Chat"
+              component={Chat}
+              options={({ route }) => ({
+                headerStyle: { backgroundColor: 'black' },
+                headerTintColor: 'white',
+                headerTitle: () => (
+                  <ProfileHeader
+                    id={route?.params?.id}
+                    avatar={route?.params?.avatar}
+                    username={route?.params?.username}
+                    name={route?.params?.name}
+                  ></ProfileHeader>
+                ),
+              })}
+            ></Stack.Screen>
 
-        {/* chat screen */}
+            {/* /set Story */}
+            <Stack.Screen
+              name="SetStory"
+              component={SetStory}
+              options={{
+                headerStyle: { backgroundColor: 'black' },
+                headerTintColor: 'white',
+                headerTitle: '',
+                headerBackVisible: false,
+                headerLeft: () => <CloseBtn></CloseBtn>,
+              }}
+            ></Stack.Screen>
 
-        <Stack.Screen
-          name="Chat"
-          component={Chat}
-          options={({ route }) => ({
-            headerStyle: { backgroundColor: 'black' },
-            headerTintColor: 'white',
-            headerTitle: () => (
-              <ProfileHeader
-                id={route?.params?.id}
-                avatar={route?.params?.avatar}
-                username={route?.params?.username}
-                name={route?.params?.name}
-              ></ProfileHeader>
-            ),
-          })}
-        ></Stack.Screen>
+            {/* set story step2 */}
 
-        {/* /set Story */}
-        <Stack.Screen
-          name="SetStory"
-          component={SetStory}
-          options={{
-            headerStyle: { backgroundColor: 'black' },
-            headerTintColor: 'white',
-            headerTitle: '',
-            headerBackVisible: false,
-            headerLeft: () => <CloseBtn></CloseBtn>,
-          }}
-        ></Stack.Screen>
+            <Stack.Screen
+              name="Step2"
+              component={Step2}
+              options={{ headerShown: false }}
+            ></Stack.Screen>
 
-        {/* set story step2 */}
+            <Stack.Screen
+              name="FullScreenStory"
+              component={FullScreenStory}
+              options={{ headerShown: false }}
+            ></Stack.Screen>
 
-        <Stack.Screen
-          name="Step2"
-          component={Step2}
-          options={{ headerShown: false }}
-        ></Stack.Screen>
+            {/* /Create Post */}
+            <Stack.Screen
+              name="CreatePostStep1"
+              component={CreatePostStep1}
+              options={({ navigation }) => ({
+                headerStyle: { backgroundColor: 'black' },
+                headerTintColor: 'white',
+                headerTitle: 'New post',
+                headerBackVisible: false,
 
-        <Stack.Screen
-          name="FullScreenStory"
-          component={FullScreenStory}
-          options={{ headerShown: false }}
-        ></Stack.Screen>
+                headerLeft: () => <CloseBtn></CloseBtn>,
+                headerRight: () => (
+                  <TouchableOpacity
+                    onPress={() => {
+                      navigation.navigate('CreatePostStep2');
+                    }}
+                  >
+                    <Text style={{ color: '#42A5F5', fontSize: 20 }}>Next</Text>
+                  </TouchableOpacity>
+                ),
+              })}
+            ></Stack.Screen>
 
-        {/* /Create Post */}
-        <Stack.Screen
-          name="CreatePostStep1"
-          component={CreatePostStep1}
-          options={({ navigation }) => ({
-            headerStyle: { backgroundColor: 'black' },
-            headerTintColor: 'white',
-            headerTitle: 'New post',
-            headerBackVisible: false,
+            {/* /Create Post step2  */}
+            <Stack.Screen
+              name="CreatePostStep2"
+              component={CreatePostStep2}
+              options={{
+                headerStyle: { backgroundColor: 'black' },
+                headerTintColor: 'white',
+                headerTitle: '',
+              }}
+            ></Stack.Screen>
 
-            headerLeft: () => <CloseBtn></CloseBtn>,
-            headerRight: () => (
-              <TouchableOpacity
-                onPress={() => {
-                  navigation.navigate('CreatePostStep2');
-                }}
-              >
-                <Text style={{ color: '#42A5F5', fontSize: 20 }}>Next</Text>
-              </TouchableOpacity>
-            ),
-          })}
-        ></Stack.Screen>
+            <Stack.Screen
+              name="SearchedProfile"
+              component={SearchedProfile}
+              options={({ route }) => ({
+                headerTintColor: 'white',
+                headerStyle: { backgroundColor: 'black' },
+                headerTitle: route?.params?.username,
 
-        {/* /Create Post step2  */}
-        <Stack.Screen
-          name="CreatePostStep2"
-          component={CreatePostStep2}
-          options={{
-            headerStyle: { backgroundColor: 'black' },
-            headerTintColor: 'white',
-            headerTitle: '',
-          }}
-        ></Stack.Screen>
+                headerRight: () => (
+                  <TouchableOpacity>
+                    <FontAwesome5
+                      name="ellipsis-v"
+                      size={15}
+                      color="white"
+                      iconStyle="solid"
+                    />
+                  </TouchableOpacity>
+                ),
+              })}
+            ></Stack.Screen>
 
-        <Stack.Screen
-          name="SearchedProfile"
-          component={SearchedProfile}
-          options={({ route }) => ({
-            headerTintColor: 'white',
-            headerStyle: { backgroundColor: 'black' },
-            headerTitle: route?.params?.username,
-
-            headerRight: () => (
-              <TouchableOpacity>
-                <FontAwesome5
-                  name="ellipsis-v"
-                  size={15}
-                  color="white"
-                  iconStyle="solid"
-                />
-              </TouchableOpacity>
-            ),
-          })}
-        ></Stack.Screen>
-
-        {/* editProfile */}
-        <Stack.Screen
-          name="EditProfile"
-          component={EditProfile}
-          options={{
-            headerTitle: 'Edit profile',
-            headerStyle: { backgroundColor: 'black' },
-            headerTintColor: 'white',
-          }}
-        ></Stack.Screen>
+            {/* editProfile */}
+            <Stack.Screen
+              name="EditProfile"
+              component={EditProfile}
+              options={{
+                headerTitle: 'Edit profile',
+                headerStyle: { backgroundColor: 'black' },
+                headerTintColor: 'white',
+              }}
+            ></Stack.Screen>
+          </>
+        )}
       </Stack.Navigator>
     </>
   );

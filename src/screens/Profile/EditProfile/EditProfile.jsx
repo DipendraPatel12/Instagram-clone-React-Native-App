@@ -1,4 +1,5 @@
 import {
+  ActivityIndicator,
   Image,
   StyleSheet,
   Text,
@@ -11,42 +12,37 @@ import React, { useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadToCloudinary } from '../../../services/cloudinary';
 import firestore from '@react-native-firebase/firestore';
-import { getUserProfile } from '../../../redux/slices/authSlice';
+import {
+  getUserProfile,
+  updateProfile,
+} from '../../../redux/slices/profileSlice';
 
 import styles from './EditProfileStyle';
+import { rh } from '../../../helper/responsive';
 const EditProfile = ({ navigation, route }) => {
   const dispatch = useDispatch();
-  const { user } = useSelector(state => state.auth);
+  const { profile, success, loading } = useSelector(state => state.profile);
   const type = route?.params?.type;
   const [previewImage, setPreviewImage] = useState(
-    route?.params?.img || user?.avtar || '',
+    route?.params?.img || profile?.avtar || '',
   );
   const [userData, setUserData] = useState({
-    name: user.name || '',
-    username: user.username || '',
-    bio: user.bio || '',
-    avtar: '',
+    name: profile?.name || '',
+    username: profile?.username || '',
+    bio: profile?.bio || '',
+    avtar: profile?.avtar || '',
   });
 
   // console.log('userData', userData);
 
-  const updateProfile = async () => {
-    try {
-      // console.log('update fn called');
-      const url = await uploadToCloudinary(previewImage, type);
-      const updatedData = { ...userData, avtar: url };
-      const data = await firestore()
-        .collection('users')
-        .doc(user.id)
-        .update(updatedData);
-
-      dispatch(getUserProfile(user.id));
-
+  const saveUpdatedProfile = async () => {
+    dispatch(
+      updateProfile({ previewImage, type, userData, userId: profile.id }),
+    );
+    if (success) {
       navigation.navigate('MainTabs', {
         screen: 'Profile',
       });
-    } catch (error) {
-      console.error('Error while Updating user Details.', error);
     }
   };
   return (
@@ -102,9 +98,13 @@ const EditProfile = ({ navigation, route }) => {
         <TouchableOpacity
           style={styles.updateBtnContainer}
           activeOpacity={0.8}
-          onPress={updateProfile}
+          onPress={saveUpdatedProfile}
         >
-          <Text style={styles.updateBtnTextStyle}>Update</Text>
+          {loading ? (
+            <ActivityIndicator size={rh(5.5)}></ActivityIndicator>
+          ) : (
+            <Text style={styles.updateBtnTextStyle}>Update</Text>
+          )}
         </TouchableOpacity>
       </View>
     </View>

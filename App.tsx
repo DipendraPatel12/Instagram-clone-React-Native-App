@@ -8,12 +8,14 @@ const App = () => {
   return (
     <>
       <Provider store={store}>
+
         <StatusBar backgroundColor='black'></StatusBar>
 
         <NavigationContainer>
           <StackNavigation></StackNavigation>
         </NavigationContainer>
-      </Provider>
+
+      </Provider >
     </>
   )
 }

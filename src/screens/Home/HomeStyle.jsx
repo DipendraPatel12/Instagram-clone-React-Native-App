@@ -2,7 +2,6 @@ import { StyleSheet } from 'react-native';
 import { rh, rw, rf } from '../../helper/responsive';
 export default styles = StyleSheet.create({
   container: {
-    flex: 1,
     backgroundColor: 'black',
   },
   itemContainer: { marginBottom: rh(3), gap: rh(2) },
