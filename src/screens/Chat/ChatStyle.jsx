@@ -5,24 +5,7 @@ export default styles = StyleSheet.create({
     flex: 1,
     backgroundColor: 'black',
   },
-  itemContainer: {
-    marginBottom: rh(3),
-    paddingTop: rh(1),
-    marginHorizontal: rw(5),
-  },
-  profileImageStyle: {
-    height: rh(5),
-    width: rh(5),
-    borderRadius: 50,
-    backgroundColor: 'grey',
-  },
-  messageTextStyle: {
-    color: 'white',
-    padding: 10,
-    borderRadius: 10,
-    maxWidth: rw(70),
-    flexWrap: 'wrap',
-  },
+
   pressableBoxContainer: {
     height: rh(15),
     width: rw(30),
@@ -48,10 +31,12 @@ export default styles = StyleSheet.create({
   inputBoxContainer: {
     backgroundColor: 'black',
     paddingBottom: rh(1),
+    position: 'relative',
+    gap: 10,
   },
   inputBoxInnerContainer: {
     backgroundColor: '#424242',
-    borderRadius: 10,
+    borderRadius: 20,
     flexDirection: 'row',
     marginHorizontal: rw(4),
     paddingVertical: rh(0.5),
@@ -60,8 +45,8 @@ export default styles = StyleSheet.create({
     gap: rw(1),
   },
   cameraView: {
-    backgroundColor: 'grey',
-    padding: 10,
+    backgroundColor: '#6A1B9A',
+    padding: 5,
     borderRadius: 50,
   },
   inputTextStyle: {
@@ -71,7 +56,7 @@ export default styles = StyleSheet.create({
   },
   sendBtnContainer: {
     backgroundColor: '#6A1B9A',
-    padding: 10,
+    padding: 8,
     borderRadius: 10,
   },
   sendTextStyle: {

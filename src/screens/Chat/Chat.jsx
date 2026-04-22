@@ -1,5 +1,4 @@
 import {
-  Image,
   Pressable,
   StyleSheet,
   Text,
@@ -16,36 +15,32 @@ import { rf, rh, rw } from '../../helper/responsive';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import styles from './ChatStyle';
 import { FlashList } from '@shopify/flash-list';
-
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import MessageItem from '../../components/MessageItem';
 const Chat = ({ route }) => {
   const flatListRef = useRef();
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState([]);
   const [visible, setVisible] = useState(false);
+  const [repliedToMessage, setRepliedToMessage] = useState({
+    senderId: null,
+    content: null,
+    senderName: null,
+    messageId: null,
+  });
+  const [repliedBoxVisible, setRepliedBoxVisible] = useState(false);
   const { profile } = useSelector(state => state.profile);
   const avatar = route?.params?.avatar;
   const oppositeUserId = route?.params?.oppositeUserId;
 
   const [activeChatId, setActiveChatId] = useState(null);
   const [selectedMessageId, setSelectedMessageId] = useState(null);
-  console.log(selectedMessageId);
+  // console.log(selectedMessageId);
   // const messages = [
   //   'hii',
   //   'hello',
   //   'How are you ?',
   //   'i am good',
-  //   'what are doing ?',
-  //   'lets play cricket sdf sf sdfdsf df sf df d sdf sdf sdf sdf',
-  //   'what do say ?',
-  //   'ok',
-  //   'lets go sfsd sdf sfsdf dfgsd fsdf sdf sfsd f',
-  //   'How are you ?',
-  //   'i am good',
-  //   'what are doing ?',
-  //   'lets play cricket sdf sf sdfdsf df sf df d sdf sdf sdf sdf sfsdfsd fsd d',
-  //   'what do say ?',
-  //   'ok',
-  //   'lets go sfsd sdf sfsdf dfgsd fsdf sdf sfsd f',
   // ];
 
   useEffect(() => {
@@ -101,10 +96,22 @@ const Chat = ({ route }) => {
             senderName: profile.name,
             content: messageText,
             sendingTime: firestore.FieldValue.serverTimestamp(),
+            replyTo: repliedBoxVisible
+              ? {
+                  ...repliedToMessage,
+                }
+              : null,
           });
       }
 
       setMessageText('');
+      setRepliedBoxVisible(false);
+      setRepliedToMessage({
+        senderId: null,
+        content: null,
+        senderName: null,
+        messageId: null,
+      });
     } catch (error) {
       console.error('Error while sending message:', error);
     }
@@ -125,112 +132,146 @@ const Chat = ({ route }) => {
   };
 
   return (
-    <View style={styles.container} onPress={() => setVisible(false)}>
-      <FlashList
-        data={messages}
-        showsVerticalScrollIndicator={false}
-        keyExtractor={item => item.id.toString()}
-        ref={flatListRef}
-        renderItem={({ item }) => (
-          <View style={styles.itemContainer}>
-            <View
-              style={{
-                flexDirection: 'row',
-                alignSelf:
-                  item.senderId == profile.id ? 'flex-end' : 'flex-start',
-                gap: rw(2),
-              }}
-            >
-              {item?.senderId == oppositeUserId && (
-                <Image
-                  source={{ uri: avatar }}
-                  style={styles.profileImageStyle}
-                />
-              )}
+    <GestureHandlerRootView>
+      <View style={styles.container} onPress={() => setVisible(false)}>
+        <FlashList
+          data={messages}
+          showsVerticalScrollIndicator={false}
+          keyExtractor={item => item.id.toString()}
+          ref={flatListRef}
+          renderItem={({ item }) => {
+            const props = {
+              item,
+              profile,
+              avatar,
+              oppositeUserId,
+              setSelectedMessageId,
+              setVisible,
+              setRepliedToMessage,
+              setRepliedBoxVisible,
+            };
 
+            return <MessageItem {...props} />;
+          }}
+          contentContainerStyle={{ paddingBottom: 1 }}
+          onContentSizeChange={() =>
+            flatListRef.current?.scrollToEnd({ animated: true })
+          }
+        />
+
+        {visible && (
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={() => setVisible(false)}
+          >
+            <Pressable activeOpacity={1} style={styles.pressableBoxContainer}>
               <TouchableOpacity
-                activeOpacity={0.9}
-                onLongPress={() => {
-                  setSelectedMessageId(item.id);
-                  setVisible(!visible);
-                }}
+                style={styles.pressableBtnContainer}
+                onPress={() => deleteMessage()}
               >
-                <Text
-                  style={{
-                    backgroundColor:
-                      item?.senderId == profile.id ? '#6A1B9A' : '#424242',
-                    ...styles.messageTextStyle,
-                  }}
-                >
-                  {item?.content}
-                  {item?.replyTo}
-                </Text>
+                <FontAwesome5
+                  name="trash"
+                  color={'white'}
+                  size={15}
+                  iconStyle="solid"
+                ></FontAwesome5>
+                <Text style={styles.btnTextStyle}> Delete</Text>
               </TouchableOpacity>
+
+              <TouchableOpacity style={styles.pressableBtnContainer}>
+                <FontAwesome5
+                  name="reply"
+                  color={'white'}
+                  size={15}
+                  iconStyle="solid"
+                ></FontAwesome5>
+                <Text style={styles.btnTextStyle}> Reply</Text>
+              </TouchableOpacity>
+            </Pressable>
+          </Pressable>
+        )}
+
+        {/* INPUT BAR */}
+        {repliedBoxVisible && (
+          <View
+            style={{
+              padding: 5,
+              flexDirection: 'row',
+              justifyContent: 'space-between',
+              borderTopColor: '#424242',
+              borderWidth: 0.19,
+              alignItems: 'center',
+            }}
+          >
+            <View style={{ marginHorizontal: rw(5), padding: 5 }}>
+              <Text style={{ color: '#B0BEC5', fontSize: rf(1.4) }}>
+                {repliedToMessage.senderName == profile.name
+                  ? 'Reply to myself'
+                  : `Reply to ${repliedToMessage?.senderName}`}
+              </Text>
+              <Text style={{ color: 'white', fontSize: rf(1.4) }}>
+                {repliedToMessage.content}
+              </Text>
             </View>
+            <TouchableOpacity
+              onPress={() => {
+                setRepliedBoxVisible(false);
+                setRepliedToMessage({
+                  senderId: null,
+                  content: null,
+                  senderName: null,
+                  messageId: null,
+                });
+              }}
+              style={{ marginHorizontal: rw(5) }}
+            >
+              <FontAwesome5
+                name="times"
+                color={'white'}
+                size={15}
+                iconStyle="solid"
+              ></FontAwesome5>
+            </TouchableOpacity>
           </View>
         )}
-        // contentContainerStyle={{ paddingBottom: 1 }}
-        onContentSizeChange={() =>
-          flatListRef.current?.scrollToEnd({ animated: true })
-        }
-      />
+        <View style={styles.inputBoxContainer}>
+          <View style={styles.inputBoxInnerContainer}>
+            <View style={styles.cameraView}>
+              <Camera />
+            </View>
 
-      {visible && (
-        <Pressable
-          style={StyleSheet.absoluteFill}
-          onPress={() => setVisible(false)}
-        >
-          <Pressable activeOpacity={1} style={styles.pressableBoxContainer}>
+            <TextInput
+              placeholder="Message..."
+              placeholderTextColor="grey"
+              style={styles.inputTextStyle}
+              value={messageText}
+              onChangeText={setMessageText}
+            />
+
+            <FontAwesome5
+              name="images"
+              size={18}
+              color={'white'}
+              iconStyle="solid"
+            ></FontAwesome5>
+
             <TouchableOpacity
-              style={styles.pressableBtnContainer}
-              onPress={() => deleteMessage()}
+              style={styles.sendBtnContainer}
+              onPress={sendMessage}
             >
-              <FontAwesome5
-                name="trash"
-                color={'white'}
-                size={15}
-                iconStyle="solid"
-              ></FontAwesome5>
-              <Text style={styles.btnTextStyle}> Delete</Text>
+              <Text style={styles.sendTextStyle}>
+                <FontAwesome5
+                  name="paper-plane"
+                  size={15}
+                  color={'white'}
+                  iconStyle="solid"
+                ></FontAwesome5>
+              </Text>
             </TouchableOpacity>
-
-            <TouchableOpacity style={styles.pressableBtnContainer}>
-              <FontAwesome5
-                name="reply"
-                color={'white'}
-                size={15}
-                iconStyle="solid"
-              ></FontAwesome5>
-              <Text style={styles.btnTextStyle}> Reply</Text>
-            </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      )}
-
-      {/* INPUT BAR */}
-      <View style={styles.inputBoxContainer}>
-        <View style={styles.inputBoxInnerContainer}>
-          <View style={styles.cameraView}>
-            <Camera />
           </View>
-
-          <TextInput
-            placeholder="Message..."
-            placeholderTextColor="grey"
-            style={styles.inputTextStyle}
-            value={messageText}
-            onChangeText={setMessageText}
-          />
-
-          <TouchableOpacity
-            style={styles.sendBtnContainer}
-            onPress={sendMessage}
-          >
-            <Text style={styles.sendTextStyle}>Send</Text>
-          </TouchableOpacity>
         </View>
       </View>
-    </View>
+    </GestureHandlerRootView>
   );
 };
 
