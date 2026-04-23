@@ -16,6 +16,7 @@ import {
   getContacts,
   searchSuggestedContact,
 } from '../../redux/slices/chatSlice';
+import EmptyData from '../../components/EmptyData';
 const ContactSuggestion = ({ navigation }) => {
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState();
@@ -132,15 +133,7 @@ const ContactSuggestion = ({ navigation }) => {
             </TouchableHighlight>
           )}
           ListEmptyComponent={
-            <View
-              style={{
-                flex: 1,
-                justifyContent: 'center',
-                alignItems: 'center',
-              }}
-            >
-              <Text style={{ color: 'white' }}>No contacts yet!</Text>
-            </View>
+            <EmptyData title={'No Contacts yet!'}></EmptyData>
           }
         ></FlatList>
       </View>

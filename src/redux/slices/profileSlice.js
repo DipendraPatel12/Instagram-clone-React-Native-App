@@ -40,7 +40,8 @@ export const getUserProfile = createAsyncThunk(
                 ...data,
                 followersCount: userFollow.size,
                 followingCount: userFollowing.size,
-                postCount: userPost.size
+                postCount: userPost.size,
+                
             };
         } catch (error) {
             console.error("Error while Fetching User Profile", error);

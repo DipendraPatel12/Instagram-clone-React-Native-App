@@ -60,6 +60,8 @@ const Chat = ({ route }) => {
         ? { id: existingDoc.id, ...existingDoc.data() }
         : null;
 
+      if (!existingChat) return;
+
       setActiveChatId(existingChat?.id);
 
       const unsubscribe = firestore()
@@ -177,7 +179,7 @@ const Chat = ({ route }) => {
                 ></FontAwesome5>
                 <Text style={styles.btnTextStyle}> Delete</Text>
               </TouchableOpacity>
-
+              {/* 
               <TouchableOpacity style={styles.pressableBtnContainer}>
                 <FontAwesome5
                   name="reply"
@@ -186,7 +188,7 @@ const Chat = ({ route }) => {
                   iconStyle="solid"
                 ></FontAwesome5>
                 <Text style={styles.btnTextStyle}> Reply</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
             </Pressable>
           </Pressable>
         )}

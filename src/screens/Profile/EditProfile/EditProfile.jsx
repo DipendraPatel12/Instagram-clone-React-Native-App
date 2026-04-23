@@ -36,14 +36,13 @@ const EditProfile = ({ navigation, route }) => {
   // console.log('userData', userData);
 
   const saveUpdatedProfile = async () => {
-    dispatch(
+    await dispatch(
       updateProfile({ previewImage, type, userData, userId: profile.id }),
-    );
-    if (success) {
-      navigation.navigate('MainTabs', {
-        screen: 'Profile',
-      });
-    }
+    ).unwrap();
+
+    navigation.navigate('MainTabs', {
+      screen: 'Profile',
+    });
   };
   return (
     <View style={styles.container}>

@@ -5,6 +5,8 @@ import {
   TouchableOpacity,
   View,
   RefreshControl,
+  Pressable,
+  StyleSheet,
 } from 'react-native';
 import React, { use, useEffect, useState } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
@@ -22,6 +24,8 @@ import {
   postLike,
 } from '../../redux/slices/postSlice';
 import { rh, rw } from '../../helper/responsive';
+import Loader from '../../components/Loader';
+import { getStories } from '../../redux/slices/storySlice';
 
 const Home = ({ navigation }) => {
   const dispatch = useDispatch();
@@ -35,17 +39,18 @@ const Home = ({ navigation }) => {
   const { profile } = useSelector(state => state.profile);
   const { user } = useSelector(state => state.auth);
   const { posts, loading } = useSelector(state => state.posts);
+  const [visible, setVisible] = useState(false);
 
   console.warn('user data ---------------------------->', user);
   console.warn('posts from store', posts);
   // console.log('profile in home ', loggedInUser);
   // console.log('storeis', allStories);
-  const Post = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+  // const Post = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 
   useEffect(() => {
     dispatch(getUserProfile(loggedInUser.uid));
     dispatch(getPosts(loggedInUser.uid));
-    // getStories();
+    dispatch(getStories(loggedInUser));
   }, []);
 
   // const getStories = async () => {
@@ -60,17 +65,10 @@ const Home = ({ navigation }) => {
   //     id: doc.id,
   //     ...doc.data(),
   //   }));
-  //   // const formattedStories = [
-  //   //   {
-  //   //     isMyStory: true,
-  //   //     avatar: profile?.avtar,
-  //   //     user_id: profile?.id,
-  //   //   },
-  //   //   ...storiesData,
-  //   // ];
+
   //   const myStory = storiesData.find(st => st.user_id == profile.id);
   //   const otherStories = storiesData.filter(st => st.user_id != profile.id);
-  //   const formattedStories = [
+  //   const updatedStories = [
   //     {
   //       isMyStory: true,
   //       ...myStory,
@@ -78,7 +76,7 @@ const Home = ({ navigation }) => {
   //     ...otherStories,
   //   ];
 
-  //   setAllStories(formattedStories);
+  //   setAllStories(updatedStories);
   // };
 
   // const getStories = async () => {
@@ -118,27 +116,6 @@ const Home = ({ navigation }) => {
   //   setAllStories(formattedStories);
   // };
 
-  // const poslike = async id => {
-  //   dispatch(getSinglePost(id));
-  //   try {
-  //     const likeRef = firestore()
-  //       .collection('posts')
-  //       .doc(id)
-  //       .collection('likes')
-  //       .doc(profile.id);
-
-  //     const data = await likeRef.get();
-
-  //     if (data.exists()) {
-  //       await likeRef.delete();
-  //     } else {
-  //       await likeRef.set({});
-  //     }
-  //     console.log('post liked or unliked', data);
-  //   } catch (error) {
-  //     console.error('Error while Post like', error);
-  //   }
-  // };
   const onRefresh = async () => {
     setRefreshing(true);
     setTimeout(() => {
@@ -152,6 +129,7 @@ const Home = ({ navigation }) => {
     dispatch(postLike({ id, userId: profile.id }));
   };
 
+  if (loading) return <Loader></Loader>;
   return (
     <View style={styles.container}>
       <FlatList
@@ -195,14 +173,16 @@ const Home = ({ navigation }) => {
                 </View>
               </TouchableOpacity>
 
-              <TouchableOpacity>
-                <FontAwesome5
-                  name="ellipsis-v"
-                  size={15}
-                  color="white"
-                  iconStyle="solid"
-                />
-              </TouchableOpacity>
+              {item?.user_id === profile.id && (
+                <TouchableOpacity onPress={() => setVisible(true)}>
+                  <FontAwesome5
+                    name="ellipsis-v"
+                    size={15}
+                    color="white"
+                    iconStyle="solid"
+                  />
+                </TouchableOpacity>
+              )}
             </View>
 
             {/* image */}
@@ -213,8 +193,8 @@ const Home = ({ navigation }) => {
                     uri: item?.post_media_url,
                   }}
                   style={{ height: rh(50), width: rw(100) }}
-                  paused={false} 
-                  repeat={true} 
+                  paused={false}
+                  repeat={true}
                   muted={true}
                 />
               ) : (
@@ -290,16 +270,31 @@ const Home = ({ navigation }) => {
             </View>
           </View>
         )}
-        // ListHeaderComponent={
-        //   <StoriesSlider stories={allStories}></StoriesSlider>
-        // }
-        ListEmptyComponent={<EmptyData title={'Post'}></EmptyData>}
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: Post.length === 0 ? 'center' : 'flex-start',
-          alignItems: Post.length === 0 ? 'center' : 'stretch',
-        }}
+        ListHeaderComponent={<StoriesSlider></StoriesSlider>}
+        ListEmptyComponent={<EmptyData title={'No post yet!'}></EmptyData>}
       ></FlatList>
+
+      {visible && (
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={() => setVisible(false)}
+        >
+          <Pressable activeOpacity={1} style={styles.pressableBoxContainer}>
+            <TouchableOpacity
+              style={styles.pressableBtnContainer}
+              onPress={() => deleteMessage()}
+            >
+              <FontAwesome5
+                name="trash"
+                color={'white'}
+                size={15}
+                iconStyle="solid"
+              ></FontAwesome5>
+              <Text style={styles.btnTextStyle}> Delete</Text>
+            </TouchableOpacity>
+          </Pressable>
+        </Pressable>
+      )}
     </View>
   );
 };

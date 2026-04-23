@@ -24,6 +24,7 @@ export default styles = StyleSheet.create({
     fontWeight: '800',
     fontSize: rf(1.8),
     width: rw(75),
+    color: 'white',
   },
   innerContainer: {
     marginHorizontal: rw(5),

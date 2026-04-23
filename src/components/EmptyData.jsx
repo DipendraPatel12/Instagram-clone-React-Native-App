@@ -9,7 +9,7 @@ const EmptyData = ({ title }) => {
         alignItems: 'center',
       }}
     >
-      <Text style={{ color: 'white' }}>{title}</Text>
+      <Text style={{ color: 'grey' }}>{title}</Text>
     </View>
   );
 };

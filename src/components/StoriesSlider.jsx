@@ -13,13 +13,14 @@ import { rf, rh, rw } from '../helper/responsive';
 import { useSelector } from 'react-redux';
 import { FlashList } from '@shopify/flash-list';
 
-const StoriesSlider = ({ stories }) => {
+const StoriesSlider = () => {
   // const stories = [1, 2, 3, 4, 5, 6, 7, 8];
 
-  console.warn('stories', stories);
+
   const navigation = useNavigation();
 
   const { profile } = useSelector(state => state.profile);
+  const { stories } = useSelector(state => state.story);
   return (
     <>
       <FlashList
@@ -34,13 +35,19 @@ const StoriesSlider = ({ stories }) => {
           <View style={{ marginRight: rw(5) }}>
             <TouchableOpacity
               style={
-                item.isMyStory
+                index === 0
                   ? { ...styles.storyStyle }
                   : { ...styles.storyStyle, ...styles.userStory }
               }
               onPress={() => {
-                if (item.isMyStory) {
-                  navigation.navigate('SetStory');
+                if (index === 0) {
+                  if (item?.isMyStory) {
+                    navigation.navigate('FullScreenStory', {
+                      story: item,
+                    });
+                  } else {
+                    navigation.navigate('SetStory');
+                  }
                 } else {
                   navigation.navigate('FullScreenStory', {
                     story: item,
@@ -50,7 +57,7 @@ const StoriesSlider = ({ stories }) => {
             >
               <Image
                 source={{
-                  uri: item.isMyStory ? profile?.avtar : item?.avatar,
+                  uri: index === 0 ? profile?.avtar : item?.avatar,
                 }}
                 style={styles.imageStyle}
               ></Image>
@@ -60,12 +67,15 @@ const StoriesSlider = ({ stories }) => {
               <TouchableOpacity
                 style={styles.storyUploadContainer}
                 activeOpacity={0.8}
+                onPress={() => {
+                  navigation.navigate('SetStory');
+                }}
               >
                 <Text style={styles.plusTextStyle}>+</Text>
               </TouchableOpacity>
             )}
             <Text style={styles.usernameText}>
-              {item.user_id === profile?.id ? 'Your story' : item?.username}
+              {index === 0 ? 'Your story' : item?.username}
             </Text>
           </View>
         )}

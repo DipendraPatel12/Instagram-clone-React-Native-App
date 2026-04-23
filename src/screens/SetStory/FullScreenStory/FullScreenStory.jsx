@@ -5,6 +5,8 @@ import { rh, rw } from '../../../helper/responsive';
 const FullScreenStory = ({ route, navigation }) => {
   const { story } = route.params;
 
+  console.log('Story ..', story);
+
   return (
     <View style={{ flex: 1, backgroundColor: 'black' }}>
       <View style={{ position: 'relative' }}>

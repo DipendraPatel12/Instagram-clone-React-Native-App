@@ -38,7 +38,7 @@ const SetStory = ({ navigation }) => {
 
   // console.log('data', data);
 
-  const dData = [1, 2, 3, 4, 5];
+  // const dData = [1, 2, 3, 4, 5];
   return (
     <View style={{ flex: 1, backgroundColor: '#263238' }}>
       {!data && (

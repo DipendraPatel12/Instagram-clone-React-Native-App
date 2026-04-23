@@ -1,7 +1,6 @@
 import { Image, Text, TextInput, TouchableHighlight, View } from 'react-native';
 import React, { useEffect, useState, useCallback } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5/static';
-import firestore, { disableNetwork } from '@react-native-firebase/firestore';
 import { useDispatch, useSelector } from 'react-redux';
 import { useFocusEffect } from '@react-navigation/native';
 import styles from './MessageStyle';
@@ -10,25 +9,17 @@ import {
   getRecentChats,
   searchRecentChatWith,
 } from '../../redux/slices/chatSlice';
+import { rh, rw } from '../../helper/responsive';
+import Loader from '../../components/Loader';
+import EmptyData from '../../components/EmptyData';
 
 const Message = ({ navigation }) => {
   const dispatch = useDispatch();
   const [searchText, setSearchText] = useState('');
   const [chats, setChats] = useState([]);
   const { profile } = useSelector(state => state.profile);
-  const { recentChats } = useSelector(state => state.chat);
-  console.log('REddddddddddddddddddddddddd=0', recentChats);
-  const handleSearch = () => {
-    if (searchText === '') {
-      return;
-    }
-    const data = chats.filter(chat =>
-      recentChats?.otherUser?.name
-        .toLowerCase()
-        .startsWith(searchText.toLowerCase()),
-    );
-    setChats(data);
-  };
+  const { recentChats, loading } = useSelector(state => state.chat);
+  // console.log('Recentchat', recentChats);
 
   useEffect(() => {
     // handleSearch();
@@ -82,6 +73,7 @@ const Message = ({ navigation }) => {
 
   // const messages = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14];
 
+  if (loading) return <Loader></Loader>;
   return (
     <View style={styles.container}>
       <FlashList
@@ -119,7 +111,7 @@ const Message = ({ navigation }) => {
                 <Text style={styles.usernameTextStyle}>
                   {item?.otherUser?.name}
                 </Text>
-                <Text style={styles.usernameTextStyle}>4+ new messages</Text>
+                <Text style={styles.usernameTextStyle}>{item?.otherUser?.username}</Text>
               </View>
             </View>
           </TouchableHighlight>
@@ -143,7 +135,13 @@ const Message = ({ navigation }) => {
             <Text style={styles.messagesTextStyle}>Messages</Text>
           </View>
         }
+        ListEmptyComponent={<EmptyData title={'No recents chat!'}></EmptyData>}
       ></FlashList>
+      {/* {loading && (
+        <View style={[StyleSheet.absoluteFill, { justifyContent: 'center' }]}>
+          <ActivityIndicator></ActivityIndicator>
+        </View>
+      )} */}
     </View>
   );
 };

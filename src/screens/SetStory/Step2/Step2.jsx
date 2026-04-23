@@ -1,30 +1,42 @@
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import React from 'react';
 import { rf, rh, rw } from '../../../helper/responsive';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
-import { useSelector } from 'react-redux';
-import { uploadToCloudinary } from '../../../services/cloudinary';
-import firestore from '@react-native-firebase/firestore';
+import { useDispatch, useSelector } from 'react-redux';
+import { postStory } from '../../../redux/slices/storySlice';
 const Step2 = ({ route, navigation }) => {
+  const dispatch = useDispatch();
   const { url, type } = route?.params || '';
   const { profile } = useSelector(state => state.profile);
+  const { success, loading } = useSelector(state => state.story);
 
-  const postStory = async () => {
-    // console.log('called');
-    const now = new Date();
-    const storyUrl = await uploadToCloudinary(url, type);
-    await firestore()
-      .collection('stories')
-      .doc(profile.id)
-      .collection('list')
-      .add({
-        user_id: profile.id,
-        username: profile.username,
-        avatar: profile.avtar || '',
-        story_url: storyUrl,
-        createdAt: firestore.FieldValue.serverTimestamp(),
-        expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
-      });
+  // const postStory = async () => {
+  //   // console.log('called');
+  //   const now = new Date();
+  //   const storyUrl = await uploadToCloudinary(url, type);
+  //   await firestore()
+  //     .collection('stories')
+  //     .add({
+  //       user_id: profile.id,
+  //       username: profile.username,
+  //       avatar: profile.avtar || null,
+  //       story_url: storyUrl,
+  //       createdAt: firestore.FieldValue.serverTimestamp(),
+  //       expiresAt: new Date(now.getTime() + 24 * 60 * 60 * 1000),
+  //     });
+  //   navigation.navigate('MainTabs', {
+  //     screen: 'Home',
+  //   });
+  // };
+  const post = async () => {
+    await dispatch(postStory({ type, url, profile })).unwrap();
     navigation.navigate('MainTabs', {
       screen: 'Home',
     });
@@ -66,7 +78,6 @@ const Step2 = ({ route, navigation }) => {
           ></FontAwesome5>
         </TouchableOpacity>
       </View>
-
       {/* image */}
       <View>
         <Image
@@ -74,7 +85,6 @@ const Step2 = ({ route, navigation }) => {
           style={{ width: rw(100), height: rh(80), borderRadius: 30 }}
         ></Image>
       </View>
-
       <View
         style={{
           marginBottom: rh(5),
@@ -93,7 +103,7 @@ const Step2 = ({ route, navigation }) => {
             borderRadius: 50,
           }}
           activeOpacity={0.8}
-          onPress={postStory}
+          onPress={post}
         >
           <FontAwesome5
             name="arrow-right"
@@ -103,6 +113,11 @@ const Step2 = ({ route, navigation }) => {
           ></FontAwesome5>
         </TouchableOpacity>
       </View>
+      {loading && (
+        <View style={{ position: 'absolute', top: rh(50), left: rw(50) }}>
+          <ActivityIndicator color={'white'} size={'large'}></ActivityIndicator>
+        </View>
+      )}
     </View>
   );
 };

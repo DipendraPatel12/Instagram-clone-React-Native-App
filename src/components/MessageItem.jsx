@@ -1,8 +1,12 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React, { useCallback } from 'react';
-import { rh, rw } from '../helper/responsive';
+import { rf, rh, rw } from '../helper/responsive';
 import { runOnJS } from 'react-native-reanimated';
-import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import {
+  Gesture,
+  GestureDetector,
+  GestureHandlerRootView,
+} from 'react-native-gesture-handler';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -55,7 +59,7 @@ const MessageItem = ({
   }));
 
   return (
-    <GestureDetector gesture={panGesture}>
+    
       <View style={[styles.itemContainer]}>
         <View
           style={{
@@ -67,28 +71,51 @@ const MessageItem = ({
           {item?.senderId == oppositeUserId && (
             <Image source={{ uri: avatar }} style={styles.profileImageStyle} />
           )}
-          <TouchableOpacity
-            activeOpacity={0.9}
-            onLongPress={() => {
-              setSelectedMessageId(item.id);
-              setVisible(true);
-            }}
-          >
-            <Animated.View style={animatedStyle}>
-              <Text
-                style={{
-                  backgroundColor:
-                    item?.senderId == profile.id ? '#6A1B9A' : '#424242',
-                  ...styles.messageTextStyle,
+
+          <View style={{ gap: 2 }}>
+            {item?.replyTo && (
+              <View style={{ gap: 3, marginRight: rw(10) }}>
+                <Text style={{ color: 'grey', fontSize: rf(1.5) }}>
+                  {item?.replyTo?.senderName == item.senderName
+                    ? `${item?.replyTo?.senderName} replied`
+                    : `you replied`}
+                </Text>
+                <Text
+                  style={{
+                    backgroundColor:
+                      item?.senderId == profile.id ? '#8d64a6' : '#424242',
+                    ...styles.repliedMessageTextStyle,
+                  }}
+                >
+                  {item?.replyTo?.content}
+                </Text>
+              </View>
+            )}
+            <GestureDetector gesture={panGesture}>
+              <TouchableOpacity
+                activeOpacity={0.9}
+                onLongPress={() => {
+                  setSelectedMessageId(item.id);
+                  setVisible(true);
                 }}
               >
-                {item?.content}
-              </Text>
-            </Animated.View>
-          </TouchableOpacity>
+                <Animated.View style={animatedStyle}>
+                  <Text
+                    style={{
+                      backgroundColor:
+                        item?.senderId == profile.id ? '#6A1B9A' : '#424242',
+                      ...styles.messageTextStyle,
+                    }}
+                  >
+                    {item?.content}
+                  </Text>
+                </Animated.View>
+              </TouchableOpacity>
+            </GestureDetector>
+          </View>
         </View>
       </View>
-    </GestureDetector>
+    
   );
 };
 
@@ -98,7 +125,7 @@ const styles = StyleSheet.create({
   itemContainer: {
     marginBottom: rh(3),
     paddingTop: rh(1),
-    marginHorizontal: rw(5),
+    marginHorizontal: rw(2),
   },
   profileImageStyle: {
     height: rh(5),
@@ -107,6 +134,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'grey',
   },
   messageTextStyle: {
+    color: 'white',
+    padding: 10,
+    borderRadius: 20,
+    maxWidth: rw(70),
+    flexWrap: 'wrap',
+  },
+  repliedMessageTextStyle: {
     color: 'white',
     padding: 10,
     borderRadius: 20,

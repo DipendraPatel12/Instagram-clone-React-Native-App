@@ -71,4 +71,26 @@ export default styles = StyleSheet.create({
     color: 'grey',
     fontWeight: '500',
   },
+  pressableBoxContainer: {
+    height: rh(10),
+    width: rw(30),
+    borderRadius: 25,
+    backgroundColor: '#212121',
+    position: 'absolute',
+    right: rw(5),
+    alignSelf: 'center',
+    elevation: 5,
+    padding: 20,
+    gap: 20,
+    justifyContent: 'center',
+  },
+  pressableBtnContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  btnTextStyle: {
+    color: 'white',
+    fontSize: rf(2),
+  },
 });

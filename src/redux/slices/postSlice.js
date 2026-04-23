@@ -70,18 +70,15 @@ const postSlice = createSlice({
                 state.error = action.payload
             })
             .addCase(postLike.pending, (state, action) => {
-                state.loading = true
                 state.error = false
             })
             .addCase(postLike.fulfilled, (state, action) => {
-                state.loading = false
                 const post = state.posts.find(post => post.id == action.payload.postId)
                 post.isLiked = action.payload.isLiked
                 post.likesCount = action.payload.isLiked ? post.likesCount + 1 : post.likesCount == 0 ? 0 : post.likesCount - 1;
 
             })
             .addCase(postLike.rejected, (state, action) => {
-                state.loading = false
                 state.error = action.payload
             })
 
