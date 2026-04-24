@@ -46,7 +46,7 @@ const StoriesSlider = () => {
                       story: item,
                     });
                   } else {
-                    navigation.navigate('SetStory');
+                    navigation.navigate('Gallery');
                   }
                 } else {
                   navigation.navigate('FullScreenStory', {
@@ -68,7 +68,7 @@ const StoriesSlider = () => {
                 style={styles.storyUploadContainer}
                 activeOpacity={0.8}
                 onPress={() => {
-                  navigation.navigate('SetStory');
+                  navigation.navigate('Gallery');
                 }}
               >
                 <Text style={styles.plusTextStyle}>+</Text>

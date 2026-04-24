@@ -4,7 +4,8 @@ import { CameraRoll } from '@react-native-camera-roll/camera-roll';
 import { FlashList } from '@shopify/flash-list';
 import EmptyData from '../../components/EmptyData';
 import { rh, rw } from '../../helper/responsive';
-const SetStory = ({ navigation }) => {
+const Gallery = ({ navigation, route }) => {
+  
   const [data, setData] = useState([]);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [endCursor, setEndCursor] = useState();
@@ -87,12 +88,14 @@ const SetStory = ({ navigation }) => {
         renderItem={({ item }) => (
           <TouchableOpacity
             style={{ position: 'relative' }}
-            onPress={() =>
-              navigation.navigate('Step2', {
-                url: item?.node?.image?.uri,
-                type: item?.node?.type,
-              })
-            }
+            onPress={() => {
+            
+                navigation.navigate('Step2', {
+                  url: item?.node?.image?.uri,
+                  type: item?.node?.type,
+                });
+              
+            }}
           >
             <Image
               source={{ uri: item?.node?.image?.uri }}
@@ -122,6 +125,6 @@ const SetStory = ({ navigation }) => {
   );
 };
 
-export default SetStory;
+export default Gallery;
 
 const styles = StyleSheet.create({});

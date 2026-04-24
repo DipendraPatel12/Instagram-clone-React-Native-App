@@ -1,5 +1,6 @@
 import firestore from "@react-native-firebase/firestore";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { act } from "react";
 
 
 export const getRecentChats = createAsyncThunk('chat/getRecentChats', async (userId, { rejectWithValue }) => {
@@ -62,10 +63,50 @@ export const getContacts = createAsyncThunk('chat/getContacts', async (userId, {
 })
 
 
+export const deleteMessage = createAsyncThunk('chat/deleteMesssage', async ({ chatId, messageId }, { rejectWithValue }) => {
+    try {
+        await firestore().collection("chats").doc(chatId).collection('messages').doc(messageId).delete()
+        return true
+    } catch (error) {
+        console.error("Error While deleting message", error)
+        return rejectWithValue(error)
+    }
+})
+
+export const sendMessage = createAsyncThunk('chat/sendMessage', async (data, { rejectWithValue }) => {
+    try {
+        await firestore()
+            .collection('chats')
+            .doc(data.activeChatId)
+            .collection('messages')
+            .add({
+                senderId: data.profile.id,
+                senderName: data.profile.name,
+                content: data.messageText,
+                sendingTime: firestore.FieldValue.serverTimestamp(),
+                replyTo: data.repliedBoxVisible
+                    ? {
+                        ...data.repliedToMessage,
+                    }
+                    : null,
+            });
+        return true
+
+    } catch (error) {
+        console.error("Error While sending message", error)
+        return rejectWithValue(error)
+    }
+})
 
 
+const createChatBetweenUsers = createAsyncThunk('chat/createChatBetweenUsers', async ({ rejectWithValue }) => {
+    try {
 
-
+    } catch (error) {
+        console.error("Error While Creating Chat between users ", error)
+        return rejectWithValue(error)
+    }
+})
 const chatSlice = createSlice({
     name: 'chat',
     initialState: {
@@ -118,6 +159,26 @@ const chatSlice = createSlice({
             .addCase(getContacts.rejected, (state, action) => {
                 state.error = action.payload
                 state.loading = false
+            })
+            .addCase(deleteMessage.pending, (state, action) => {
+                state.success = action.payload
+            })
+            .addCase(deleteMessage.fulfilled, (state, action) => {
+                state.success = action.payload
+            })
+            .addCase(deleteMessage.rejected, (state, action) => {
+                state.success = false
+                state.error = action.payload
+            })
+            .addCase(sendMessage.pending, (state, action) => {
+                state.success = action.payload
+            })
+            .addCase(sendMessage.fulfilled, (state, action) => {
+                state.success = action.payload
+            })
+            .addCase(sendMessage.rejected, (state, action) => {
+                state.success = false
+                state.error = action.payload
             })
     }
 })

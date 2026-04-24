@@ -7,6 +7,7 @@ import {
   RefreshControl,
   Pressable,
   StyleSheet,
+  FlatListComponent,
 } from 'react-native';
 import React, { use, useEffect, useState } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
@@ -19,6 +20,8 @@ import { getAuth } from '@react-native-firebase/auth';
 import styles from './HomeStyle';
 import Video from 'react-native-video';
 import {
+  deletePost,
+  getMyPosts,
   getPosts,
   getSinglePost,
   postLike,
@@ -34,13 +37,12 @@ const Home = ({ navigation }) => {
   // const des = 'sdf sfdsf sfsfsdf ';
   const [showMore, setShowMore] = useState(false);
   const [selectedShowMoreIndex, setSelectedShowMoreIndex] = useState();
-  const [allStories, setAllStories] = useState([]);
   const loggedInUser = getAuth().currentUser._user;
   const { profile } = useSelector(state => state.profile);
   const { user } = useSelector(state => state.auth);
   const { posts, loading } = useSelector(state => state.posts);
   const [visible, setVisible] = useState(false);
-
+  const [selectedPostId, setSelectedPostId] = useState();
   console.warn('user data ---------------------------->', user);
   console.warn('posts from store', posts);
   // console.log('profile in home ', loggedInUser);
@@ -50,7 +52,8 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     dispatch(getUserProfile(loggedInUser.uid));
     dispatch(getPosts(loggedInUser.uid));
-    dispatch(getStories(loggedInUser));
+    dispatch(getStories(loggedInUser.uid));
+    dispatch(getMyPosts(loggedInUser.uid));
   }, []);
 
   // const getStories = async () => {
@@ -125,8 +128,13 @@ const Home = ({ navigation }) => {
   };
 
   const toggleLike = id => {
-    console.warn('called');
+    // console.warn('called');
     dispatch(postLike({ id, userId: profile.id }));
+  };
+
+  const postDelete = () => {
+    dispatch(deletePost(selectedPostId));
+    setVisible(false);
   };
 
   if (loading) return <Loader></Loader>;
@@ -162,7 +170,7 @@ const Home = ({ navigation }) => {
               >
                 <View style={styles.imageContainer}>
                   <Image
-                    source={{ uri: item?.post_media_url }}
+                    source={{ uri: item?.userAvatar }}
                     style={styles.profileImageStyle}
                   ></Image>
                 </View>
@@ -174,7 +182,12 @@ const Home = ({ navigation }) => {
               </TouchableOpacity>
 
               {item?.user_id === profile.id && (
-                <TouchableOpacity onPress={() => setVisible(true)}>
+                <TouchableOpacity
+                  onPress={() => {
+                    setSelectedPostId(item.id);
+                    setVisible(true);
+                  }}
+                >
                   <FontAwesome5
                     name="ellipsis-v"
                     size={15}
@@ -220,7 +233,6 @@ const Home = ({ navigation }) => {
                   />
                   <Text style={styles.actionTextStyle}>
                     {item?.likesCount == 0 ? '' : item?.likesCount}
-                    {item?.isLiked}
                   </Text>
                 </TouchableOpacity>
 
@@ -250,9 +262,9 @@ const Home = ({ navigation }) => {
               <View>
                 <Text style={styles.postDescTextStyle}>
                   {showMore && selectedShowMoreIndex === index
-                    ? `${item?.content} `
-                    : `${item?.content.substring(0, 90)}`}
-                  {item?.content.length > 90 && (
+                    ? `${item?.content || ' '} `
+                    : `${item?.content?.substring(0, 90) || ''}`}
+                  {item?.content?.length > 90 && (
                     <Text
                       style={styles.showMoreLessTextStyle}
                       onPress={() => {
@@ -282,7 +294,7 @@ const Home = ({ navigation }) => {
           <Pressable activeOpacity={1} style={styles.pressableBoxContainer}>
             <TouchableOpacity
               style={styles.pressableBtnContainer}
-              onPress={() => deleteMessage()}
+              onPress={() => postDelete()}
             >
               <FontAwesome5
                 name="trash"

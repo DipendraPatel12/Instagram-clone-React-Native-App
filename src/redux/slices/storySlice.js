@@ -20,10 +20,10 @@ export const getStories = createAsyncThunk("story/getStories", async (user, { re
             createdAt: doc.createdAt?.toDate().toISOString(),
             expiresAt: doc.expiresAt?.toDate().toISOString()
         }));
-        console.log("userid dd d ", user.uid)
+        console.log("userid dd d ", user)
 
-        const myStory = storiesData.find(st => st.user_id == user.uid)
-        const otherStories = storiesData.filter(st => st.user_id != user.uid);
+        const myStory = storiesData.find(st => st.user_id == user)
+        const otherStories = storiesData.filter(st => st.user_id != user);
         console.log("MY STory and otherStories ", myStory, otherStories)
         const updatedStories = myStory != undefined ? [
             {

@@ -10,48 +10,56 @@ import {
 import React, { useState } from 'react';
 
 import { uploadToCloudinary } from '../../../services/cloudinary';
-
 import firestore from '@react-native-firebase/firestore';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import styles from './CreatePostStep2Style';
+import { uploadPost } from '../../../redux/slices/postSlice';
 
 const CreatePostStep2 = ({ route, navigation }) => {
   const [visible, setVisible] = useState(false);
   const [content, setContent] = useState('');
   const [text, setText] = useState(false);
   const { img, type } = route?.params;
-
+  const dispatch = useDispatch();
   const { profile } = useSelector(state => state.profile);
-
+  const { loading } = useSelector(state => state.posts);
   // console.log('profile from redux ', profile);
 
-  const [uploading, setUploading] = useState(false);
-  console.warn(img, type);
+  // const [uploading, setUploading] = useState(false);
+  // console.warn(img, type);
 
-  const uploadPost = async () => {
-    setUploading(true);
-    if (img === '') {
+  // const uploadPost = async () => {
+  //   setUploading(true);
+  //   if (img === '') {
+  //     return;
+  //   }
+  //   try {
+  //     const url = await uploadToCloudinary(img, type);
+  //     await firestore()
+  //       .collection('posts')
+  //       .add({
+  //         user_id: profile.id,
+  //         username: profile?.username || 'Unknown',
+  //         userAvatar: profile?.avtar,
+  //         post_media_url: url,
+  //         content: content,
+  //       });
+
+  //     setUploading(false);
+  //     navigation.navigate('MainTabs');
+  //   } catch (error) {
+  //     console.log('Error while uploading post', error);
+  //     return;
+  //   }
+  // };
+
+  const postUpload = async () => {
+    if (!img || !type) {
       return;
     }
-    try {
-      const url = await uploadToCloudinary(img, type);
-      await firestore()
-        .collection('posts')
-        .add({
-          user_id: profile.id,
-          username: profile?.username || 'Unknown',
-          userAvatar: profile?.avtar,
-          post_media_url: url,
-          content: content,
-        });
-
-      setUploading(false);
-      navigation.navigate('MainTabs');
-    } catch (error) {
-      console.log('Error while uploading post', error);
-      return;
-    }
+    await dispatch(uploadPost({ content, profile, img, type })).unwrap();
+    navigation.navigate('MainTabs');
   };
   return (
     <View style={styles.container}>
@@ -96,9 +104,9 @@ const CreatePostStep2 = ({ route, navigation }) => {
       </View>
 
       <View style={styles.postingContainer}>
-        <TouchableOpacity style={styles.postBtnContainer} onPress={uploadPost}>
+        <TouchableOpacity style={styles.postBtnContainer} onPress={postUpload}>
           <Text style={styles.postTextStyle}>
-            {uploading ? 'Posting...' : 'Post'}
+            {loading ? 'Posting...' : 'Post'}
           </Text>
         </TouchableOpacity>
       </View>

@@ -10,7 +10,7 @@ import React, { useState } from 'react';
 import { getAuth, signOut } from '@react-native-firebase/auth';
 import { StackActions } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
-
+import ProfileTabs from '../../navigations/ProfileTabs';
 import styles from './ProfileStyle';
 import { clearUser } from '../../redux/slices/authSlice';
 
@@ -39,7 +39,7 @@ const Profile = ({ navigation }) => {
             <TouchableOpacity
               style={{}}
               activeOpacity={0.9}
-              onPress={() => navigation.navigate('SetStory')}
+              onPress={() => navigation.navigate('Gallery')}
             >
               <Text style={styles.plusTextStyle}>+</Text>
             </TouchableOpacity>
@@ -95,28 +95,33 @@ const Profile = ({ navigation }) => {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.createPostContainer}>
-        <Image
-          source={require('../../assets/images/splash1.png')}
-          style={styles.splashImageStyle}
-        ></Image>
+      {profile.postCount == 0 ? (
+        <View style={styles.createPostContainer}>
+          <Image
+            source={require('../../assets/images/splash1.png')}
+            style={styles.splashImageStyle}
+          ></Image>
 
-        <View style={{ gap: 10 }}>
-          <Text style={styles.createPostTextStyle}>Create your first post</Text>
-          <Text style={styles.createPostText2Style}>
-            Give this spave some love
-          </Text>
+          <View style={{ gap: 10 }}>
+            <Text style={styles.createPostTextStyle}>
+              Create your first post
+            </Text>
+            <Text style={styles.createPostText2Style}>
+              Give this spave some love
+            </Text>
+          </View>
+
+          {/* create buttonn */}
+          <TouchableOpacity
+            onPress={() => navigation.navigate('CreatePostStep1')}
+            style={{ backgroundColor: '#1976D2', borderRadius: 10 }}
+          >
+            <Text style={styles.createBtnTextStyle}>Create</Text>
+          </TouchableOpacity>
         </View>
-
-        {/* create buttonn */}
-        <TouchableOpacity
-          onPress={() => navigation.navigate('CreatePostStep1')}
-          style={{ backgroundColor: '#1976D2', borderRadius: 10 }}
-        >
-          <Text style={styles.createBtnTextStyle}>Create</Text>
-        </TouchableOpacity>
-      </View>
-
+      ) : (
+        <ProfileTabs></ProfileTabs>
+      )}
       {/* <TouchableOpacity
         style={{
           backgroundColor: '#1976D2',

@@ -59,39 +59,39 @@ const MessageItem = ({
   }));
 
   return (
-    
-      <View style={[styles.itemContainer]}>
-        <View
-          style={{
-            flexDirection: 'row',
-            alignSelf: item.senderId == profile.id ? 'flex-end' : 'flex-start',
-            gap: rw(2),
-          }}
-        >
-          {item?.senderId == oppositeUserId && (
-            <Image source={{ uri: avatar }} style={styles.profileImageStyle} />
-          )}
+    <View style={[styles.itemContainer]}>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignSelf: item.senderId == profile.id ? 'flex-end' : 'flex-start',
+          gap: rw(2),
+        }}
+      >
+        {item?.senderId == oppositeUserId && (
+          <Image source={{ uri: avatar }} style={styles.profileImageStyle} />
+        )}
 
-          <View style={{ gap: 2 }}>
-            {item?.replyTo && (
-              <View style={{ gap: 3, marginRight: rw(10) }}>
-                <Text style={{ color: 'grey', fontSize: rf(1.5) }}>
-                  {item?.replyTo?.senderName == item.senderName
-                    ? `${item?.replyTo?.senderName} replied`
-                    : `you replied`}
-                </Text>
-                <Text
-                  style={{
-                    backgroundColor:
-                      item?.senderId == profile.id ? '#8d64a6' : '#424242',
-                    ...styles.repliedMessageTextStyle,
-                  }}
-                >
-                  {item?.replyTo?.content}
-                </Text>
-              </View>
-            )}
-            <GestureDetector gesture={panGesture}>
+        <View style={{ gap: 2 }}>
+          {item?.replyTo && (
+            <View style={{ gap: 3, marginRight: rw(10) }}>
+              <Text style={{ color: 'grey', fontSize: rf(1.5) }}>
+                {item?.senderId === profile.id
+                  ? 'You replied'
+                  : `${item?.replyTo?.senderName} replied`}
+              </Text>
+              <Text
+                style={{
+                  backgroundColor:
+                    item?.senderId == profile.id ? '#8d64a6' : '#424242',
+                  ...styles.repliedMessageTextStyle,
+                }}
+              >
+                {item?.replyTo?.content}
+              </Text>
+            </View>
+          )}
+          <GestureDetector gesture={panGesture}>
+            <Animated.View style={animatedStyle}>
               <TouchableOpacity
                 activeOpacity={0.9}
                 onLongPress={() => {
@@ -99,23 +99,21 @@ const MessageItem = ({
                   setVisible(true);
                 }}
               >
-                <Animated.View style={animatedStyle}>
-                  <Text
-                    style={{
-                      backgroundColor:
-                        item?.senderId == profile.id ? '#6A1B9A' : '#424242',
-                      ...styles.messageTextStyle,
-                    }}
-                  >
-                    {item?.content}
-                  </Text>
-                </Animated.View>
+                <Text
+                  style={{
+                    backgroundColor:
+                      item?.senderId == profile.id ? '#6A1B9A' : '#424242',
+                    ...styles.messageTextStyle,
+                  }}
+                >
+                  {item?.content}
+                </Text>
               </TouchableOpacity>
-            </GestureDetector>
-          </View>
+            </Animated.View>
+          </GestureDetector>
         </View>
       </View>
-    
+    </View>
   );
 };
 

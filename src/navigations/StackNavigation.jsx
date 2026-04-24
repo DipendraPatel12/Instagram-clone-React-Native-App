@@ -8,7 +8,7 @@ import CreatePassword from '../screens/CreatePassword/CreatePassword';
 import ContactSuggestion from '../screens/ContactSuggestion/ContactSuggestion';
 import CreatePostStep1 from '../screens/CreatePost/CreatePostStep1/CreatePostStep1';
 import CreatePostStep2 from '../screens/CreatePost/CreatePostStep2/CreatePostStep2';
-import SetStory from '../screens/SetStory/SetStory';
+import Gallery from '../screens/SetStory/Gallery';
 import Chat from '../screens/Chat/Chat';
 import Splash from '../screens/Splash/Splash';
 import CreatePostBtn from '../components/CreatePostBtn';
@@ -164,8 +164,8 @@ const StackNavigation = ({ navigation }) => {
 
             {/* /set Story */}
             <Stack.Screen
-              name="SetStory"
-              component={SetStory}
+              name="Gallery"
+              component={Gallery}
               options={{
                 headerStyle: { backgroundColor: 'black' },
                 headerTintColor: 'white',

@@ -41,7 +41,7 @@ export const getUserProfile = createAsyncThunk(
                 followersCount: userFollow.size,
                 followingCount: userFollowing.size,
                 postCount: userPost.size,
-                
+
             };
         } catch (error) {
             console.error("Error while Fetching User Profile", error);
@@ -88,7 +88,7 @@ export const getSearchedProfile = createAsyncThunk('profile/getSearchedProfile',
             .get();
 
 
-        let isFollowed;
+        let isFollowed = false;
         userFollow.docs.forEach(doc => {
             if (doc === data.userId);
             {
@@ -109,6 +109,7 @@ export const getSearchedProfile = createAsyncThunk('profile/getSearchedProfile',
             .get();
         const user = userDetails.data();
 
+        // console.warn("sfdsfsf f--------------------------------------------------------------------------->", isFollowed)
         return {
             ...user,
             postCount: usersPosts.size,
@@ -116,6 +117,7 @@ export const getSearchedProfile = createAsyncThunk('profile/getSearchedProfile',
             followingCount: userFollowing.size,
             isFollowed
         };
+
 
     } catch (error) {
         console.error("Error while Getting Searched Profile", error)

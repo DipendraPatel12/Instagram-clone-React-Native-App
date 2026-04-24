@@ -64,7 +64,7 @@ const MainTabs = () => {
           headerRight: () => <MessageContacts></MessageContacts>,
           tabBarIcon: () => (
             <FontAwesome5
-              name="share"
+              name="paper-plane"
               size={20}
               color="white"
               iconStyle="solid"

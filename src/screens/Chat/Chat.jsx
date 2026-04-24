@@ -10,15 +10,17 @@ import React, { useEffect, useRef, useState } from 'react';
 
 import Camera from '../../components/Camera';
 import firestore from '@react-native-firebase/firestore';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { rf, rh, rw } from '../../helper/responsive';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
 import styles from './ChatStyle';
 import { FlashList } from '@shopify/flash-list';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MessageItem from '../../components/MessageItem';
+import { deleteMessage, sendMessage } from '../../redux/slices/chatSlice';
 const Chat = ({ route }) => {
   const flatListRef = useRef();
+  const dispatch = useDispatch();
   const [messageText, setMessageText] = useState('');
   const [messages, setMessages] = useState([]);
   const [visible, setVisible] = useState(false);
@@ -84,27 +86,23 @@ const Chat = ({ route }) => {
     }
   };
 
-  const sendMessage = async () => {
+  const messageSend = async () => {
     try {
       if (messageText === '') return;
 
-      if (activeChatId) {
-        await firestore()
-          .collection('chats')
-          .doc(activeChatId)
-          .collection('messages')
-          .add({
-            senderId: profile.id,
-            senderName: profile.name,
-            content: messageText,
-            sendingTime: firestore.FieldValue.serverTimestamp(),
-            replyTo: repliedBoxVisible
-              ? {
-                  ...repliedToMessage,
-                }
-              : null,
-          });
+      if (!activeChatId) {
+        return;
       }
+
+      dispatch(
+        sendMessage({
+          activeChatId,
+          profile,
+          messageText,
+          repliedBoxVisible,
+          repliedToMessage,
+        }),
+      );
 
       setMessageText('');
       setRepliedBoxVisible(false);
@@ -119,18 +117,11 @@ const Chat = ({ route }) => {
     }
   };
 
-  const deleteMessage = async () => {
-    try {
-      await firestore()
-        .collection('chats')
-        .doc(activeChatId)
-        .collection('messages')
-        .doc(selectedMessageId)
-        .delete();
-      setVisible(false);
-    } catch (error) {
-      console.error('Error while deleting message:', error);
-    }
+  const messageDelete = () => {
+    dispatch(
+      deleteMessage({ chatId: activeChatId, messageId: selectedMessageId }),
+    );
+    setVisible(false);
   };
 
   return (
@@ -141,6 +132,7 @@ const Chat = ({ route }) => {
           showsVerticalScrollIndicator={false}
           keyExtractor={item => item.id.toString()}
           ref={flatListRef}
+          initialScrollIndex={messages.length - 1}
           renderItem={({ item }) => {
             const props = {
               item,
@@ -169,7 +161,7 @@ const Chat = ({ route }) => {
             <Pressable activeOpacity={1} style={styles.pressableBoxContainer}>
               <TouchableOpacity
                 style={styles.pressableBtnContainer}
-                onPress={() => deleteMessage()}
+                onPress={() => messageDelete()}
               >
                 <FontAwesome5
                   name="trash"
@@ -249,17 +241,18 @@ const Chat = ({ route }) => {
               value={messageText}
               onChangeText={setMessageText}
             />
-
-            <FontAwesome5
-              name="images"
-              size={18}
-              color={'white'}
-              iconStyle="solid"
-            ></FontAwesome5>
+            <TouchableOpacity>
+              <FontAwesome5
+                name="images"
+                size={18}
+                color={'white'}
+                iconStyle="solid"
+              ></FontAwesome5>
+            </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.sendBtnContainer}
-              onPress={sendMessage}
+              onPress={messageSend}
             >
               <Text style={styles.sendTextStyle}>
                 <FontAwesome5
