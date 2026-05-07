@@ -43,7 +43,7 @@ const MainTabs = () => {
           headerTitle: '𝑰𝒏𝒔𝒕𝒂𝒈𝒓𝒂𝒎',
           headerTitleStyle: { fontSize: 25 },
           headerLeft: () => <CreatePostBtn></CreatePostBtn>,
-          headerRight: () => <Notification></Notification>,
+          // headerRight: () => <Notification></Notification>,
           tabBarIcon: ({ focused }) => (
             <FontAwesome5
               name="home"
@@ -96,18 +96,27 @@ const MainTabs = () => {
           headerTitle: profile?.username || 'Unknown',
           headerTitleStyle: { fontSize: 20 },
           headerLeft: () => <CreatePostBtn></CreatePostBtn>,
-          headerRight: () => <MessageContacts></MessageContacts>,
+          // headerRight: () => <MessageContacts></MessageContacts>,
           tabBarIcon: ({ focused }) => (
-            <Image
-              source={{ uri: profile?.avtar }}
+            <View
               style={{
                 height: rh(3.5),
                 width: rh(3.5),
                 borderRadius: 50,
-                borderWidth: rw(0.3),
-                borderColor: 'white',
+                backgroundColor: 'grey',
               }}
-            ></Image>
+            >
+              <Image
+                source={{ uri: profile?.avtar }}
+                style={{
+                  height: rh(3.5),
+                  width: rh(3.5),
+                  borderRadius: 50,
+                  // borderWidth: rw(0.3),
+                  // borderColor: 'white',
+                }}
+              ></Image>
+            </View>
           ),
         }}
       />

@@ -68,7 +68,7 @@ export const uploadPost = createAsyncThunk("posts/uploadPost", async (data, { re
             .collection('posts')
             .add({
                 user_id: data?.profile?.id,
-                username: data?.profile?.username || 'Unknown',
+                username: data?.profile?.username || data?.profile?.name,
                 userAvatar: data?.profile?.avtar,
                 post_media_url: url,
                 content: data.content,
@@ -126,7 +126,7 @@ const postSlice = createSlice({
             .addCase(postLike.fulfilled, (state, action) => {
                 const post = state.posts.find(post => post.id == action.payload.postId)
                 post.isLiked = action.payload.isLiked
-                post.likesCount = action.payload.isLiked ? Number(post.likesCount) + 1 : Number(post.likesCount) == 0 ? 0 : Number(post.likesCount) - 1;
+                post.likesCount = action.payload.isLiked ? Number(post.likesCount || 0) + 1 : Number(post.likesCount) == 0 ? 0 : Number(post.likesCount) - 1;
 
             })
             .addCase(postLike.rejected, (state, action) => {

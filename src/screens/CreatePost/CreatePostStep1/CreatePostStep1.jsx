@@ -127,6 +127,7 @@ const CreatePostStep1 = ({ route }) => {
       <FlashList
         data={data}
         numColumns={3}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={styles.itemContainer}

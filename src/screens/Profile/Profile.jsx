@@ -8,7 +8,6 @@ import {
 } from 'react-native';
 import React, { useState } from 'react';
 import { getAuth, signOut } from '@react-native-firebase/auth';
-import { StackActions } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import ProfileTabs from '../../navigations/ProfileTabs';
 import styles from './ProfileStyle';
@@ -20,8 +19,8 @@ const Profile = ({ navigation }) => {
 
   const handleLogOut = async () => {
     try {
-      dispatch(clearUser());
       await signOut(getAuth());
+      dispatch(clearUser());
     } catch (error) {
       console.error(error);
     }

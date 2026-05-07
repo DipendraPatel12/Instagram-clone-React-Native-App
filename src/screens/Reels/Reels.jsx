@@ -10,7 +10,8 @@ const Reels = () => {
       <FlashList
         data={[]}
         numColumns={3}
-        renderItem={({ item}) => <Text></Text>}
+        keyExtractor={(item, index) => index.toString()}
+        renderItem={({ item }) => <Text></Text>}
         ListEmptyComponent={<EmptyData title={'No Reels'}></EmptyData>}
         contentContainerStyle={{ marginVertical: rh(20) }}
       ></FlashList>

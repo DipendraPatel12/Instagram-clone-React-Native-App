@@ -19,6 +19,7 @@ const Search = ({ navigation }) => {
       <SearchProfile setResults={setResults}></SearchProfile>
       <FlashList
         data={results}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <TouchableHighlight
             style={styles.itemContainer}

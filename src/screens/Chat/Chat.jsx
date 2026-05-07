@@ -18,6 +18,7 @@ import { FlashList } from '@shopify/flash-list';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import MessageItem from '../../components/MessageItem';
 import { deleteMessage, sendMessage } from '../../redux/slices/chatSlice';
+import { SafeAreaView } from 'react-native-safe-area-context';
 const Chat = ({ route }) => {
   const flatListRef = useRef();
   const dispatch = useDispatch();
@@ -86,7 +87,7 @@ const Chat = ({ route }) => {
     }
   };
 
-  const messageSend = async () => {
+  const messageSend = () => {
     try {
       if (messageText === '') return;
 
@@ -125,8 +126,8 @@ const Chat = ({ route }) => {
   };
 
   return (
-    <GestureHandlerRootView>
-      <View style={styles.container} onPress={() => setVisible(false)}>
+    <View style={styles.container} onPress={() => setVisible(false)}>
+      <GestureHandlerRootView>
         <FlashList
           data={messages}
           showsVerticalScrollIndicator={false}
@@ -241,14 +242,14 @@ const Chat = ({ route }) => {
               value={messageText}
               onChangeText={setMessageText}
             />
-            <TouchableOpacity>
+            {/* <TouchableOpacity>
               <FontAwesome5
                 name="images"
                 size={18}
                 color={'white'}
                 iconStyle="solid"
               ></FontAwesome5>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <TouchableOpacity
               style={styles.sendBtnContainer}
@@ -265,8 +266,8 @@ const Chat = ({ route }) => {
             </TouchableOpacity>
           </View>
         </View>
-      </View>
-    </GestureHandlerRootView>
+      </GestureHandlerRootView>
+    </View>
   );
 };
 

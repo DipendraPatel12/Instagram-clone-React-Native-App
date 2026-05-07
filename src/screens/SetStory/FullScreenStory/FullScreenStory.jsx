@@ -39,7 +39,7 @@ const FullScreenStory = ({ route, navigation }) => {
         ></Image>
 
         <Text style={{ color: 'white' }}>{story.username}</Text>
-        <Text style={{ color: 'grey' }}>24h</Text>
+        {/* <Text style={{ color: 'grey' }}>24h</Text> */}
       </TouchableOpacity>
     </View>
   );

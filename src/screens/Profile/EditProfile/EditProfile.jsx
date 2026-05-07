@@ -18,27 +18,41 @@ import {
 } from '../../../redux/slices/profileSlice';
 
 import styles from './EditProfileStyle';
-import { rh } from '../../../helper/responsive';
+import { rf, rh, rw } from '../../../helper/responsive';
+
 const EditProfile = ({ navigation, route }) => {
   const dispatch = useDispatch();
+  const [isError, setIsError] = useState(true);
+  const [errorField, setErrorFiels] = useState('');
   const { profile, success, loading } = useSelector(state => state.profile);
   const type = route?.params?.type;
   const [previewImage, setPreviewImage] = useState(
-    route?.params?.img || profile?.avtar || '',
+    route?.params?.img || profile?.avtar || null,
   );
   const [userData, setUserData] = useState({
-    name: profile?.name || '',
-    username: profile?.username || '',
-    bio: profile?.bio || '',
-    avtar: profile?.avtar || '',
+    name: profile?.name,
+    username: profile?.username,
+    bio: profile?.bio,
+    avtar: profile?.avtar || null,
   });
 
   // console.log('userData', userData);
 
   const saveUpdatedProfile = async () => {
-    await dispatch(
-      updateProfile({ previewImage, type, userData, userId: profile.id }),
-    ).unwrap();
+    if (userData.name === '') {
+      setErrorFiels('name');
+      setIsError(true);
+      return;
+    }
+    if (userData.username === '') {
+      setErrorFiels('username');
+      setIsError(true);
+      return;
+    }
+    if (userData.name === '' || userData.username)
+      await dispatch(
+        updateProfile({ previewImage, type, userData, userId: profile.id }),
+      ).unwrap();
 
     navigation.navigate('MainTabs', {
       screen: 'Profile',
@@ -73,6 +87,17 @@ const EditProfile = ({ navigation, route }) => {
             onChangeText={text => setUserData({ ...userData, name: text })}
           ></TextInput>
         </View>
+        {isError && errorField === 'name' ? (
+          <Text
+            style={{
+              color: 'red',
+              fontSize: rf(1.5),
+              marginHorizontal: rw(7),
+            }}
+          >
+            username required!
+          </Text>
+        ) : null}
 
         <View style={styles.inputBoxContainer}>
           <Text style={styles.inputPlaceHolderTextStyle}>Username</Text>
@@ -83,6 +108,18 @@ const EditProfile = ({ navigation, route }) => {
             onChangeText={text => setUserData({ ...userData, username: text })}
           ></TextInput>
         </View>
+
+        {isError && errorField === 'username' ? (
+          <Text
+            style={{
+              color: 'red',
+              fontSize: rf(1.5),
+              marginHorizontal: rw(7),
+            }}
+          >
+            username required!
+          </Text>
+        ) : null}
 
         <View style={styles.inputBoxContainer}>
           <Text style={styles.inputPlaceHolderTextStyle}>Bio</Text>

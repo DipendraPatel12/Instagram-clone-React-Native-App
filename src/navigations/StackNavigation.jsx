@@ -19,15 +19,14 @@ import SetUsername from '../screens/SetUsername/SetUsername';
 import SearchedProfile from '../screens/SearchedProfile/SearchedProfile';
 import FullScreenStory from '../screens/SetStory/FullScreenStory/FullScreenStory';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
-
 import MainTabs from '../navigations/MainTabs';
 import EditProfile from '../screens/Profile/EditProfile/EditProfile';
 import Step2 from '../screens/SetStory/Step2/Step2';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAuth, onAuthStateChanged } from '@react-native-firebase/auth';
 import { clearUser, setUser } from '../redux/slices/authSlice';
-const Stack = createNativeStackNavigator();
 
+const Stack = createNativeStackNavigator();
 const StackNavigation = ({ navigation }) => {
   const dispatch = useDispatch();
 
@@ -183,6 +182,7 @@ const StackNavigation = ({ navigation }) => {
               options={{ headerShown: false }}
             ></Stack.Screen>
 
+            {/* fullscreen story */}
             <Stack.Screen
               name="FullScreenStory"
               component={FullScreenStory}
@@ -223,6 +223,7 @@ const StackNavigation = ({ navigation }) => {
               }}
             ></Stack.Screen>
 
+            {/* searched Profile screen */}
             <Stack.Screen
               name="SearchedProfile"
               component={SearchedProfile}
@@ -262,5 +263,4 @@ const StackNavigation = ({ navigation }) => {
 };
 
 export default StackNavigation;
-
 const styles = StyleSheet.create({});

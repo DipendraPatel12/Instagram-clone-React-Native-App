@@ -184,8 +184,6 @@ const profileSlice = createSlice({
         success: false
     },
 
-    reducers: {},
-
     extraReducers: (builder) => {
         builder
             .addCase(getUserProfile.pending, (state) => {

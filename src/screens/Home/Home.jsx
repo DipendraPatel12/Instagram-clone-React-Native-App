@@ -7,7 +7,6 @@ import {
   RefreshControl,
   Pressable,
   StyleSheet,
-  FlatListComponent,
 } from 'react-native';
 import React, { use, useEffect, useState } from 'react';
 import FontAwesome5 from '@react-native-vector-icons/fontawesome5';
@@ -180,13 +179,34 @@ const Home = ({ navigation }) => {
                   </Text>
                 </View>
               </TouchableOpacity>
-
+              {visible && String(selectedPostId) === item.id && (
+                <Pressable
+                  style={StyleSheet.absoluteFill}
+                  onPress={() => setVisible(false)}
+                >
+                  <Pressable style={styles.pressableBoxContainer}>
+                    <TouchableOpacity
+                      style={styles.pressableBtnContainer}
+                      onPress={postDelete}
+                    >
+                      <FontAwesome5
+                        name="trash"
+                        color="white"
+                        size={15}
+                        iconStyle="solid"
+                      />
+                      <Text style={styles.btnTextStyle}> Delete</Text>
+                    </TouchableOpacity>
+                  </Pressable>
+                </Pressable>
+              )}
               {item?.user_id === profile.id && (
                 <TouchableOpacity
                   onPress={() => {
                     setSelectedPostId(item.id);
                     setVisible(true);
                   }}
+                  style={{padding:10}}
                 >
                   <FontAwesome5
                     name="ellipsis-v"
@@ -285,28 +305,6 @@ const Home = ({ navigation }) => {
         ListHeaderComponent={<StoriesSlider></StoriesSlider>}
         ListEmptyComponent={<EmptyData title={'No post yet!'}></EmptyData>}
       ></FlatList>
-
-      {visible && (
-        <Pressable
-          style={StyleSheet.absoluteFill}
-          onPress={() => setVisible(false)}
-        >
-          <Pressable activeOpacity={1} style={styles.pressableBoxContainer}>
-            <TouchableOpacity
-              style={styles.pressableBtnContainer}
-              onPress={() => postDelete()}
-            >
-              <FontAwesome5
-                name="trash"
-                color={'white'}
-                size={15}
-                iconStyle="solid"
-              ></FontAwesome5>
-              <Text style={styles.btnTextStyle}> Delete</Text>
-            </TouchableOpacity>
-          </Pressable>
-        </Pressable>
-      )}
     </View>
   );
 };

@@ -5,7 +5,6 @@ import { FlashList } from '@shopify/flash-list';
 import EmptyData from '../../components/EmptyData';
 import { rh, rw } from '../../helper/responsive';
 const Gallery = ({ navigation, route }) => {
-  
   const [data, setData] = useState([]);
   const [hasNextPage, setHasNextPage] = useState(false);
   const [endCursor, setEndCursor] = useState();
@@ -84,17 +83,16 @@ const Gallery = ({ navigation, route }) => {
       )}
       <FlashList
         data={data}
+        keyExtractor={(item, index) => index.toString()}
         numColumns={3}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={{ position: 'relative' }}
             onPress={() => {
-            
-                navigation.navigate('Step2', {
-                  url: item?.node?.image?.uri,
-                  type: item?.node?.type,
-                });
-              
+              navigation.navigate('Step2', {
+                url: item?.node?.image?.uri,
+                type: item?.node?.type,
+              });
             }}
           >
             <Image

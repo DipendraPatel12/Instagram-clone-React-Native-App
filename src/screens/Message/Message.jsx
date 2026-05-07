@@ -26,14 +26,14 @@ const Message = ({ navigation }) => {
     dispatch(searchRecentChatWith(searchText));
   }, [searchText]);
 
-  useEffect(() => {
-    dispatch(getRecentChats(profile.id));
-  }, []);
+  // useEffect(() => {
+  //   dispatch(getRecentChats(profile.id));
+  // }, []);
 
   useFocusEffect(
     useCallback(() => {
+      dispatch(getRecentChats(profile.id));
       setSearchText('');
-      console.log('Screen is focused');
     }, []),
   );
   // const getRecentChats = async () => {
@@ -79,13 +79,12 @@ const Message = ({ navigation }) => {
       <FlashList
         data={recentChats}
         showsVerticalScrollIndicator={false}
+        keyExtractor={(item, index) => index.toString()}
         renderItem={({ item }) => (
           <TouchableHighlight
             style={styles.itemContainer}
             activeOpacity={0.6}
             underlayColor="#263238"
-            // onPress={() => alert('Pressed!')}
-
             onPress={() =>
               navigation.navigate('Chat', {
                 id: item?.otherUser?.id,
@@ -111,7 +110,9 @@ const Message = ({ navigation }) => {
                 <Text style={styles.usernameTextStyle}>
                   {item?.otherUser?.name}
                 </Text>
-                <Text style={styles.usernameTextStyle}>{item?.otherUser?.username}</Text>
+                <Text style={styles.usernameTextStyle}>
+                  {item?.otherUser?.username}
+                </Text>
               </View>
             </View>
           </TouchableHighlight>

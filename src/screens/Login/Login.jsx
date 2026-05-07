@@ -4,12 +4,10 @@ import {
   getAuth,
   signInWithEmailAndPassword,
 } from '@react-native-firebase/auth';
-import { StackActions } from '@react-navigation/native';
-import { useDispatch } from 'react-redux';
-import { getUserProfile } from '../../redux/slices/authSlice';
+
 import styles from './LoginStyle';
+
 const Login = ({ navigation }) => {
-  const dipatch = useDispatch();
   const [email, setEmail] = useState('dipendrapatel926@gmail.com');
   const [password, setPassword] = useState('12345678');
   const [isError, setIsError] = useState(false);
@@ -28,10 +26,8 @@ const Login = ({ navigation }) => {
       Alert.alert('All field required!');
       return;
     }
-
     setIsError(false);
     setLoading(true);
-
     try {
       const res = await signInWithEmailAndPassword(getAuth(), email, password);
 

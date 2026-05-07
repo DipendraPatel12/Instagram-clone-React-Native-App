@@ -6,6 +6,14 @@ import firestore from '@react-native-firebase/firestore';
 const SearchProfile = ({ setResults }) => {
   const [searchText, setSearchText] = useState('');
 
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      handleSearch();
+    }, 500);
+
+    return () => clearTimeout(delayDebounce);
+  }, [searchText]);
+
   const handleSearch = async () => {
     if (searchText.trim() === '') {
       setResults([]);
@@ -18,21 +26,16 @@ const SearchProfile = ({ setResults }) => {
         .where('username', '==', searchText)
         .get();
 
-      // console.log(res);
       const users = res.docs.map(doc => ({
-        ...doc._data,
+        id: doc.id,
+        ...doc.data(),
       }));
 
-      // console.log('Users:', users);
       setResults(users);
     } catch (error) {
-      console.error('Error while searching..', error);
+      console.error('Error while searching..', error.message);
     }
   };
-
-  useEffect(() => {
-    handleSearch();
-  }, [searchText]);
 
   return (
     <View style={styles.container}>

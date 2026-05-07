@@ -144,7 +144,7 @@ const chatSlice = createSlice({
                 state.error = null
             })
             .addCase(getRecentChats.rejected, (state, action) => {
-                state.error = action.payload
+                state.error = action.error?.message;
                 state.loading = false
             })
 

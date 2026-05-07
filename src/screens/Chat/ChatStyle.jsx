@@ -19,6 +19,7 @@ export default styles = StyleSheet.create({
     gap: 20,
     justifyContent: 'center',
   },
+  
   pressableBtnContainer: {
     flexDirection: 'row',
     alignItems: 'center',
